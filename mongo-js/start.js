@@ -14,13 +14,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+// switch to test db
+use test
+
+// drop test collection
 db.test.drop()
-// the createCollection is optionally
+
+// optionaly create test collection
 db.createCollection('test')
 
+// create JSON document and save it (save will add the _id to the original JSON document)
 testDoc={'field1':'value1'}
 db.test.save(testDoc)
 
+// query for _id
 db.test.find({'_id':testDoc._id})
 
+// query for field1
 db.test.find({'field1':'value1'})
