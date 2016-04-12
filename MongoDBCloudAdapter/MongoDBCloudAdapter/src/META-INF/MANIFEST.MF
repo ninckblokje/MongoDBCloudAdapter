@@ -1,0 +1,12 @@
+Bundle-ManifestVersion: 2.0
+Bundle-Version: 1
+Bundle-Name: nl.syntouch.oracle.adapter.cloud.mongodb
+Bundle-SymbolicName: nl.syntouch.oracle.adapter.cloud.mongodb
+Bundle-ClassPath: .
+Require-Bundle: oracle.external.oracle-jrf-webservices,oracle.external
+ .oracle-jrf-wsdl,oracle.external.jaxws,oracle.external.oracle-jrf-saa
+ j,oracle.sca.modeler,oracle.sca.ui.adapters,oracle.cloud.adapter.api,
+ oracle.cloud.adapter.impl,oracle.javatools,oracle.jewt-core,oracle.ex
+ ternal.balishare,oracle.sb.tooling.ide.sca,oracle.soa.tools.widgets,o
+ racle.bpm-ide-common,oracle.uic,oracle.ide,oracle.tools.cloud.adapter
+ .ide

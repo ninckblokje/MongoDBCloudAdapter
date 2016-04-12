@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Copyright 2016 SynTouch B.V.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<tns:AdapterPluginConfig xmlns:tns="http://xmlns.oracle.com/adapters/cloud">
+    <adapterPluginID>MongoDBCloudBAdapter</adapterPluginID>
+    <displayName>MongoDBCloudBAdapter</displayName>
+    <description>MongoDB Cloud Adapter</description>
+    <adapterFactory>nl.syntouch.oracle.adapter.cloud.mongodb.runtimee.MongoDBAdapterFactory</adapterFactory>
+    <supportedSecurityPolicies>
+        <policy>CUSTOM</policy>
+    </supportedSecurityPolicies>
+    <defaultSecurityPolicy>CUSTOM</defaultSecurityPolicy>
+    <propertyDefinitions>
+        <propertyDefinition>
+            <propertyName>mongoUri</propertyName>
+            <propertyType>STRING</propertyType>
+            <propertyGroup>CREDENTIALS</propertyGroup>
+            <required>true</required>
+            <persistent>true</persistent>
+            <displayName>Mongo URI, example: mongodb://localhost:27017</displayName>
+        </propertyDefinition>
+        <propertyDefinition>
+            <propertyName>mongoDb</propertyName>
+            <propertyType>STRING</propertyType>
+            <propertyGroup>CONNECTION_PROPS</propertyGroup>
+            <required>true</required>
+            <persistent>true</persistent>
+            <displayName>Database</displayName>
+        </propertyDefinition>
+        <propertyDefinition>
+            <propertyName>mongoCollection</propertyName>
+            <propertyType>STRING</propertyType>
+            <propertyGroup>CONNECTION_PROPS</propertyGroup>
+            <required>true</required>
+            <persistent>true</persistent>
+            <displayName>Collection</displayName>
+        </propertyDefinition>
+    </propertyDefinitions>
+    <UIProviderClass>nl.syntouch.oracle.adapter.cloud.mongodb.wizard.MongoDBUIProvider</UIProviderClass>
+    <resourceBundle>nl.syntouch.oracle.adapter.cloud.mongodb.definition.MongoDBCloudAdapterBundle</resourceBundle>
+    <sdkVersion>2.1.0</sdkVersion>
+</tns:AdapterPluginConfig>
