@@ -74,22 +74,26 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
     
     @Override
     public void close() {
+        logger.log(LoggerService.Level.DEBUG, "Closing connection");
         if (client != null) client.close();
     }
 
     @Override
     public AuthenticationScheme getAuthenticationScheme() {
-        // TODO Implement this method
-        return null;
+        return new MongoDBAuthenticationScheme(ctx, this);
     }
 
     @Override
     public PingStatus ping() {
         try {
             connect();
+            logger.log(LoggerService.Level.DEBUG, "Ping OK");
             
             return PingStatus.SUCCESS_STATUS;
         } catch (Exception ex) {
+            logger.log(LoggerService.Level.WARNING, "Ping NOK");
+            logger.log(LoggerService.Level.WARNING, ex.getMessage());
+            
             ex.printStackTrace();
             
             return new PingStatus(ex);

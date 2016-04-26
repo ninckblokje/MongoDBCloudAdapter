@@ -16,7 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.util.Locale;
+import java.util.ResourceBundle;
+
 public class Constants {
+    
+    private static final String resourceBundle = "nl.syntouch.oracle.adapter.cloud.mongodb.definition.MongoDBCloudAdapterBundle";
     
     public static final String ADAPTER_NAME = "MongoDBAdapter";
     public static final String VERSION = "1";
@@ -26,4 +31,10 @@ public class Constants {
     public static final String MONGO_COLLECTION_KEY = "mongoCollection";
     public static final String MONGO_DB_KEY = "mongoDb";
     public static final String MONGO_URI_KEY = "mongoUri";
+    
+    public static final String CONTEXT_SAMPLE_DOCUMENT_KEY = "MongoDB.sampleBsonDocument";
+    
+    public static String getText(Locale locale, String key) {
+        return ResourceBundle.getBundle(resourceBundle, locale).getString(key);
+    }
 }

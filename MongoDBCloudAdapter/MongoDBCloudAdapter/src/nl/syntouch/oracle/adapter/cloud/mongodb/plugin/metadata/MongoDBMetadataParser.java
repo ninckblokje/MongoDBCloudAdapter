@@ -42,6 +42,7 @@ import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.CloudOperationNod
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.FieldImpl;
 
 import org.bson.Document;
+import org.bson.types.ObjectId;
 
 public class MongoDBMetadataParser implements MetadataParser {
     
@@ -54,7 +55,9 @@ public class MongoDBMetadataParser implements MetadataParser {
     }
     
     protected void addData(Document bson, CloudApplicationModel cloudApplicationModel) {
-        QName qName = new QName(bson.getString("_id"));
+        String id = getObjectId(bson);
+        
+        QName qName = new QName(id);
         CloudDataObjectNode bsonNode = new CloudDataObjectNodeImpl(null, qName, ObjectCategory.CUSTOM, DataType.OBJECT);
         
         Set<String> keys = bson.keySet();
@@ -64,15 +67,17 @@ public class MongoDBMetadataParser implements MetadataParser {
             bsonNode.addField(new FieldImpl(key, fieldType, false, false, true, true));
         }
         
+        logger.log(LoggerService.Level.DEBUG, "Adding data from BSON document with _id [" + id + "] to CloudApplicationModel");
         cloudApplicationModel.addDataObject(bsonNode);
     }
     
     protected void addOperation(CloudApplicationModel cloudApplicationModel, String operationName) {
-        CloudOperationNodeImpl insertOperation = new CloudOperationNodeImpl();
-        insertOperation.setName(operationName);
-        insertOperation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
+        CloudOperationNodeImpl operation = new CloudOperationNodeImpl();
+        operation.setName(operationName);
+        operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
-        cloudApplicationModel.addOperation(insertOperation);
+        logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
+        cloudApplicationModel.addOperation(operation);
     }
     
     protected Document getDocumentFromDataSource(DataSource dataSource) {
@@ -81,6 +86,11 @@ public class MongoDBMetadataParser implements MetadataParser {
         } else {
             throw new RuntimeException("DataSource must be an instance of BSONDataSource");
         }
+    }
+    
+    protected String getObjectId(Document bson) {
+        ObjectId id = bson.getObjectId("_id");
+        return id.toString();
     }
     
     @Override
@@ -94,6 +104,8 @@ public class MongoDBMetadataParser implements MetadataParser {
     @Override
     public void parse(DataSource dataSource, CloudApplicationModel cloudApplicationModel,
                       Properties properties) throws MetadataParserException {
+        logger.log(LoggerService.Level.INFO, "Adding [" + operationNames.length + "] operations with data to CloudApplicationModel");
+        
         for(String operationName: operationNames) {
             addOperation(cloudApplicationModel, operationName);
         }

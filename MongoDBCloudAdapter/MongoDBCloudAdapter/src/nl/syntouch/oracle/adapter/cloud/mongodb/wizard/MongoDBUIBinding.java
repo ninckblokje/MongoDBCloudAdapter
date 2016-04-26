@@ -23,6 +23,8 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBAdapter;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.wizard.page.MongoDBOperationsPage;
+
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterConstants;
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterException;
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterFilter;
@@ -64,7 +66,8 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
         if (filter.isAddConnection()) {
             editPages.put(CloudAdapterConstants.CONNECTION_PAGE_ID, new CloudAdapterConnectionPage(this.context));
         }
-        editPages.put(CloudAdapterConstants.OPERATIONS_PAGE_ID, new CloudAdapterOperationsPage(this.context));
+        //editPages.put(CloudAdapterConstants.OPERATIONS_PAGE_ID, new CloudAdapterOperationsPage(this.context));
+        editPages.put(CloudAdapterConstants.OPERATIONS_PAGE_ID, new MongoDBOperationsPage(this.context));
         editPages.put(CloudAdapterConstants.SUMMARY_PAGE_ID, new CloudAdapterSummaryPage(this.context));
         
         return editPages;

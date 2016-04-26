@@ -60,7 +60,10 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
         MongoDBConnection connection = (MongoDBConnection) cloudConnection;
         try {
             connection.connect();
-            return connection.getCollection().find().first();
+            Document sample = connection.getCollection().find().first();
+            
+            adapterPluginContext.setContextObject(Constants.CONTEXT_SAMPLE_DOCUMENT_KEY, sample);
+            return sample;
         } finally {
             connection.close();
         }
