@@ -33,6 +33,7 @@ import oracle.tip.tools.ide.adapters.cloud.api.model.CloudDataObjectNode;
 import oracle.tip.tools.ide.adapters.cloud.api.model.DataType;
 import oracle.tip.tools.ide.adapters.cloud.api.model.InvocationStyle;
 import oracle.tip.tools.ide.adapters.cloud.api.model.ObjectCategory;
+import oracle.tip.tools.ide.adapters.cloud.api.model.OperationResponse;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.CloudApplicationModelImpl;
@@ -40,6 +41,8 @@ import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.CloudDataObjectNo
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.CloudOperationNodeImpl;
 
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.FieldImpl;
+
+import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.OperationResponseImpl;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
@@ -76,6 +79,17 @@ public class MongoDBMetadataParser implements MetadataParser {
         operation.setName(operationName);
         operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
+        switch(operationName) {
+            case "find":
+                break;
+            case "insert":
+                operation.setResponse(getInsertResponse());
+                break;
+            default:
+                logger.log(LoggerService.Level.SEVERE, "Unable to add unknown operation [" + operationName + "]");
+                throw new RuntimeException("Unable to add unknown operation [" + operationName + "]");
+        };
+        
         logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
         cloudApplicationModel.addOperation(operation);
     }
@@ -86,6 +100,17 @@ public class MongoDBMetadataParser implements MetadataParser {
         } else {
             throw new RuntimeException("DataSource must be an instance of BSONDataSource");
         }
+    }
+    
+    protected OperationResponse getInsertResponse() {
+        OperationResponseImpl response = new OperationResponseImpl();
+        
+        response.setDescription("ObjectId of newly insert document");
+        response.setName("_id");
+        response.setQualifiedName(new QName("InsertResponse"));
+        response.setResponseObject(new CloudDataObjectNodeImpl(null, new QName("_id"), ObjectCategory.CUSTOM, DataType.ID));
+        
+        return response;
     }
     
     protected String getObjectId(Document bson) {

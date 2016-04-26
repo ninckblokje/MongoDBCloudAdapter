@@ -25,6 +25,7 @@ import oracle.tip.tools.adapters.cloud.utils.CloudAdapterUtils;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.CloudMetadataBrowser;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
+import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.TransformationModelBuilder;
 import oracle.tip.tools.presentation.uiobjects.sdk.EditField;
 import oracle.tip.tools.presentation.uiobjects.sdk.SelectObject;
 
@@ -72,10 +73,7 @@ public abstract class AbstractMongoDBPage {
         return Constants.getText(getLocale(), key);
     }
     
-    protected boolean handleModeEvent(EditField eventSource, LinkedList<EditField> currentPageFields) {
-        SelectObject modeSelect = (SelectObject) eventSource.getObject();
-        String selectedMode = modeSelect.getSelectedValue();
-        
-        return false;
+    protected TransformationModelBuilder getTransformationModelBuilder() {
+        return (TransformationModelBuilder) ctx.getContextObject("_ui_ModelBuilder");
     }
 }

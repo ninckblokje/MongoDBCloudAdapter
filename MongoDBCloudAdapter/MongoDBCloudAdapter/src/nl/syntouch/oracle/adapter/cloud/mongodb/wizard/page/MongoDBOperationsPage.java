@@ -21,17 +21,20 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 
 import java.util.List;
-import java.util.Locale;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterException;
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterPageState;
 import oracle.tip.tools.adapters.cloud.api.ICloudAdapterPage;
+import oracle.tip.tools.ide.adapters.cloud.api.metadata.ObjectGrouping;
+import oracle.tip.tools.ide.adapters.cloud.api.metadata.OperationMapping;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
+import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.TransformationModelBuilder;
 import oracle.tip.tools.presentation.uiobjects.sdk.EditField;
+import oracle.tip.tools.presentation.uiobjects.sdk.ITextAreaObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.SelectObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIError;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIFactory;
@@ -67,6 +70,31 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     
     public MongoDBOperationsPage(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
+    }
+    
+    protected OperationMapping getOperationMapping(String operationName) {
+        CloudOperationNode operation = getMetadataBrowser().getOperation(operationName);
+        return new OperationMapping(operation, ObjectGrouping.ORDERED, ObjectGrouping.ORDERED, null);
+    }
+    
+    protected boolean handleModeEvent(EditField eventSource, LinkedList<EditField> currentPageFields) {
+        SelectObject modeSelect = (SelectObject) eventSource.getObject();
+        String selectedMode = modeSelect.getSelectedValue();
+        
+        EditField bsonEF = findEditField(currentPageFields, bsonEditField);
+        if (modeStructured.equals(selectedMode)) {
+            bsonEF.setDisabled(false);
+        } else {
+            bsonEF.setDisabled(true);
+        }
+        
+        return false;
+    }
+    
+    protected void updateTransformationModelBuilder(String operationName) {
+        TransformationModelBuilder modelBuilder = getTransformationModelBuilder();
+        
+        modelBuilder.addOperationMapping(getOperationMapping(operationName));
     }
     
     @Override
@@ -133,6 +161,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
 
     @Override
     public LinkedHashMap<String, ICloudAdapterPage> getChildrenEditPages() {
+        System.err.println("getChildrenEditPages");
         // TODO Implement this method
         return null;
     }
@@ -140,7 +169,23 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     @Override
     public CloudAdapterPageState updateBackEndModel(LinkedHashMap<String, ICloudAdapterPage> wizardPages,
                                                     LinkedList<EditField> currentPageFields) throws CloudAdapterException {
-        return null;
+        
+        EditField operationsEF = findEditField(currentPageFields, operationsEditField);
+        String operation = ((SelectObject) operationsEF.getObject()).getSelectedValue();
+        getContext().setContextObject(Constants.CONTEXT_OPERATION_KEY, operation);
+        
+        EditField modeEF = findEditField(currentPageFields, modeEditField);
+        String mode = ((SelectObject) modeEF.getObject()).getSelectedValue();
+        getContext().setContextObject(Constants.CONTEXT_OPERATION_KEY, mode);
+        
+        EditField bsonEF = findEditField(currentPageFields, bsonEditField);
+        String bson = ((ITextAreaObject) bsonEF.getObject()).getValue();
+        getContext().setContextObject(Constants.CONTEXT_PARSE_DOCUMENT_KEY, bson);
+        
+        updateTransformationModelBuilder(operation);
+        
+        CloudAdapterPageState state = new CloudAdapterPageState(false, wizardPages, currentPageFields);
+        return state;
     }
 
     @Override
@@ -167,6 +212,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     @Override
     public LinkedHashMap<String, UIError[]> validatePage(LinkedHashMap<String, ICloudAdapterPage> wizardPages,
                                                          LinkedList<EditField> currentPageFields) throws CloudAdapterException {
+        System.err.println("validatePage");
         return null;
     }
 }

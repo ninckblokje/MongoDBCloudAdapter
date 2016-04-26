@@ -18,6 +18,7 @@ limitations under the License.
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.generator.MongoDBMetadataGenerator;
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.metadata.MongoDBMetadataBrowser;
 
 import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
@@ -28,7 +29,7 @@ import oracle.tip.tools.ide.adapters.cloud.impl.plugin.AbstractCloudApplicationA
 
 public class MongoDBAdapter extends AbstractCloudApplicationAdapter {
     
-    private AdapterPluginContext ctx;
+    private final AdapterPluginContext ctx;
     
     public MongoDBAdapter(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
@@ -47,8 +48,7 @@ public class MongoDBAdapter extends AbstractCloudApplicationAdapter {
 
     @Override
     public RuntimeMetadataGenerator getRuntimeMetadataGenerator() {
-        // TODO Implement this method
-        return null;
+        return new MongoDBMetadataGenerator(ctx);
     }
 
     @Override

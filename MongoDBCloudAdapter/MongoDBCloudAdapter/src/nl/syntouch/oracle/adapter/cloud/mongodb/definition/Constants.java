@@ -32,6 +32,9 @@ public class Constants {
     public static final String MONGO_DB_KEY = "mongoDb";
     public static final String MONGO_URI_KEY = "mongoUri";
     
+    public static final String CONTEXT_MODE_KEY = "MongoDB.mode";
+    public static final String CONTEXT_OPERATION_KEY = "MongoDB.operation";
+    public static final String CONTEXT_PARSE_DOCUMENT_KEY = "MongoDB.parseBsonDocument";
     public static final String CONTEXT_SAMPLE_DOCUMENT_KEY = "MongoDB.sampleBsonDocument";
     
     public static String getText(Locale locale, String key) {

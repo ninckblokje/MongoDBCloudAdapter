@@ -18,7 +18,7 @@ limitations under the License.
     <adapterPluginID>MongoDBCloudBAdapter</adapterPluginID>
     <displayName>MongoDBCloudBAdapter</displayName>
     <description>MongoDB Cloud Adapter</description>
-    <adapterFactory>nl.syntouch.oracle.adapter.cloud.mongodb.runtimee.MongoDBAdapterFactory</adapterFactory>
+    <adapterFactory>nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBAdapterFactory</adapterFactory>
     <supportedSecurityPolicies>
         <policy>CUSTOM</policy>
     </supportedSecurityPolicies>

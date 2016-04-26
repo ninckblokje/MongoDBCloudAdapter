@@ -1,4 +1,4 @@
-package nl.syntouch.oracle.adapter.cloud.mongodb.runtime;
+package nl.syntouch.oracle.adapter.cloud.mongodb.plugin.generator;
 
 /*
 Copyright 2016 SynTouch B.V.
@@ -16,17 +16,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBAdapter;
-
+import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeGenerationContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
-import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapter;
-import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapterException;
-import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapterFactory;
+import oracle.tip.tools.ide.adapters.cloud.impl.generation.AbstractRuntimeMetadataGenerator;
 
-public class MongoDBAdapterFactory implements CloudApplicationAdapterFactory {
+public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     
+    private AdapterPluginContext ctx;
+    
+    public MongoDBMetadataGenerator(AdapterPluginContext adapterPluginContext) {
+        super(adapterPluginContext);
+        ctx = adapterPluginContext;
+    }
+
     @Override
-    public CloudApplicationAdapter createAdapter(AdapterPluginContext adapterPluginContext) throws CloudApplicationAdapterException {
-        return new MongoDBAdapter(adapterPluginContext);
+    protected void initializeContext(RuntimeGenerationContext runtimeGenerationContext) {
+        // TODO Implement this method
     }
 }
