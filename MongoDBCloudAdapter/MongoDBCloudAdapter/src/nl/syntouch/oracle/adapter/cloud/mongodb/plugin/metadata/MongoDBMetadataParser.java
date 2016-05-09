@@ -26,6 +26,7 @@ import javax.xml.namespace.QName;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataSource;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataTypeMapper;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
@@ -105,9 +106,9 @@ public class MongoDBMetadataParser implements MetadataParser {
         Set<String> keys = bson.keySet();
         for (String key: keys) {
             QName fieldQName = new QName(namespace, key);
-            CloudDataObjectNode fieldType = new CloudDataObjectNodeImpl(null, fieldQName, ObjectCategory.CUSTOM, DataType.OBJECT);
-            CloudDataObjectNode stringType = new CloudDataObjectNodeImpl(null, new QName("string"), ObjectCategory.BUILTIN, DataType.STRING);
-            bsonNode.addField(new FieldImpl(key, stringType, false, false, true, true));
+            System.err.println(bson.get(key).getClass().getName());
+            CloudDataObjectNode type = BSONDataTypeMapper.getDataObjectNode(bson.get(key));
+            bsonNode.addField(new FieldImpl(key, type, false, false, true, true));
         }
         
         return bsonNode;
