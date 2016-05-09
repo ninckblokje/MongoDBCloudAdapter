@@ -26,10 +26,13 @@ import javax.xml.namespace.QName;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataSource;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
+
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParserException;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudApplicationModel;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudDataObjectNode;
+import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
 import oracle.tip.tools.ide.adapters.cloud.api.model.DataType;
 import oracle.tip.tools.ide.adapters.cloud.api.model.InvocationStyle;
 import oracle.tip.tools.ide.adapters.cloud.api.model.ObjectCategory;
@@ -44,6 +47,8 @@ import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.FieldImpl;
 
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.OperationResponseImpl;
 
+import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.RequestParameterImpl;
+
 import org.bson.Document;
 import org.bson.types.ObjectId;
 
@@ -53,45 +58,59 @@ public class MongoDBMetadataParser implements MetadataParser {
     
     private final LoggerService logger;
     
+    private AdapterPluginContext ctx;
+    
     public MongoDBMetadataParser(AdapterPluginContext adapterPluginContext) {
+        ctx = adapterPluginContext;
         logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
     
-    protected void addData(Document bson, CloudApplicationModel cloudApplicationModel) {
-        String id = getObjectId(bson);
+    protected void addOperation(CloudApplicationModel cloudApplicationModel, String operationName, DataSource dataSource) {
+        String mongoNamespace = (String) ctx.getContextObject(Constants.MONGO_NAMESPACE_KEY);
+        String baseNamespace = Constants.ADAPTER_NAME + "/" + mongoNamespace;
         
-        QName qName = new QName(id);
-        CloudDataObjectNode bsonNode = new CloudDataObjectNodeImpl(null, qName, ObjectCategory.CUSTOM, DataType.OBJECT);
-        
-        Set<String> keys = bson.keySet();
-        for (String key: keys) {
-            QName fieldQName = new QName("Object");
-            CloudDataObjectNode fieldType = new CloudDataObjectNodeImpl(null, fieldQName, ObjectCategory.CUSTOM, DataType.OBJECT);
-            bsonNode.addField(new FieldImpl(key, fieldType, false, false, true, true));
-        }
-        
-        logger.log(LoggerService.Level.DEBUG, "Adding data from BSON document with _id [" + id + "] to CloudApplicationModel");
-        cloudApplicationModel.addDataObject(bsonNode);
-    }
-    
-    protected void addOperation(CloudApplicationModel cloudApplicationModel, String operationName) {
-        CloudOperationNodeImpl operation = new CloudOperationNodeImpl();
-        operation.setName(operationName);
-        operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
-        
+        logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
         switch(operationName) {
             case "find":
                 break;
             case "insert":
-                operation.setResponse(getInsertResponse());
+                cloudApplicationModel.addOperation(getInsertOperation(dataSource, baseNamespace));
                 break;
             default:
                 logger.log(LoggerService.Level.SEVERE, "Unable to add unknown operation [" + operationName + "]");
                 throw new RuntimeException("Unable to add unknown operation [" + operationName + "]");
         };
+    }
+    
+    protected CloudOperationNode getInsertOperation(DataSource dataSource, String baseNamespace) {
+        CloudOperationNodeImpl operation = new CloudOperationNodeImpl();
+        operation.setName("insert");
+        operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
-        logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
-        cloudApplicationModel.addOperation(operation);
+        Document bson = getDocumentFromDataSource(dataSource);
+        
+        RequestParameterImpl request = new RequestParameterImpl();
+        request.setDataType(getData(bson, baseNamespace + "/insert"));
+        operation.getRequestParameters().add(request);
+        
+        operation.setResponse(getInsertResponse());
+        
+        return operation;
+    }
+    
+    protected CloudDataObjectNode getData(Document bson, String namespace) {
+        QName qName = new QName(namespace, "Document");
+        CloudDataObjectNode bsonNode = new CloudDataObjectNodeImpl(null, qName, ObjectCategory.CUSTOM, DataType.OBJECT);
+        
+        Set<String> keys = bson.keySet();
+        for (String key: keys) {
+            QName fieldQName = new QName(namespace, key);
+            CloudDataObjectNode fieldType = new CloudDataObjectNodeImpl(null, fieldQName, ObjectCategory.CUSTOM, DataType.OBJECT);
+            CloudDataObjectNode stringType = new CloudDataObjectNodeImpl(null, new QName("string"), ObjectCategory.BUILTIN, DataType.STRING);
+            bsonNode.addField(new FieldImpl(key, stringType, false, false, true, true));
+        }
+        
+        return bsonNode;
     }
     
     protected Document getDocumentFromDataSource(DataSource dataSource) {
@@ -102,12 +121,16 @@ public class MongoDBMetadataParser implements MetadataParser {
         }
     }
     
+    protected OperationResponse getFindResponse() {
+        return getInsertResponse();
+    }
+    
     protected OperationResponse getInsertResponse() {
         OperationResponseImpl response = new OperationResponseImpl();
         
         response.setDescription("ObjectId of newly insert document");
         response.setName("_id");
-        response.setQualifiedName(new QName("InsertResponse"));
+        response.setQualifiedName(new QName("InsertResponseDocument"));
         response.setResponseObject(new CloudDataObjectNodeImpl(null, new QName("_id"), ObjectCategory.CUSTOM, DataType.ID));
         
         return response;
@@ -132,11 +155,8 @@ public class MongoDBMetadataParser implements MetadataParser {
         logger.log(LoggerService.Level.INFO, "Adding [" + operationNames.length + "] operations with data to CloudApplicationModel");
         
         for(String operationName: operationNames) {
-            addOperation(cloudApplicationModel, operationName);
+            addOperation(cloudApplicationModel, operationName, dataSource);
         }
-        
-        Document bson = getDocumentFromDataSource(dataSource);
-        addData(bson, cloudApplicationModel);
     }
 
     @Override

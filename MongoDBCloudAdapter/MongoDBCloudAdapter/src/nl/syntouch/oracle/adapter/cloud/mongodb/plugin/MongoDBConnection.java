@@ -18,6 +18,7 @@ limitations under the License.
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
+import com.mongodb.MongoNamespace;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
 
@@ -66,6 +67,8 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
         
         db = client.getDatabase(mongoDb);
         collection = db.getCollection(mongoCollection);
+        
+        ctx.setContextObject(Constants.MONGO_NAMESPACE_KEY, collection.getNamespace().getFullName());
     }
     
     public MongoCollection<Document> getCollection() {

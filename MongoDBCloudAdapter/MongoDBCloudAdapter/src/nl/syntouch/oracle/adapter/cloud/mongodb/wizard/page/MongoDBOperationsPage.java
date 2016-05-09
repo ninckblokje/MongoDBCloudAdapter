@@ -29,6 +29,7 @@ import oracle.tip.tools.adapters.cloud.api.CloudAdapterPageState;
 import oracle.tip.tools.adapters.cloud.api.ICloudAdapterPage;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.ObjectGrouping;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.OperationMapping;
+import oracle.tip.tools.ide.adapters.cloud.api.metadata.TypeMapping;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
@@ -74,7 +75,15 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     
     protected OperationMapping getOperationMapping(String operationName) {
         CloudOperationNode operation = getMetadataBrowser().getOperation(operationName);
-        return new OperationMapping(operation, ObjectGrouping.ORDERED, ObjectGrouping.ORDERED, null);
+        OperationMapping operationMapping = new OperationMapping(operation, ObjectGrouping.ORDERED, ObjectGrouping.ORDERED, null);
+        
+        TypeMapping requestMapping = new TypeMapping(operation.getRequestParameters().get(0).getDataType());
+        operationMapping.getRequestObjectMappings().add(requestMapping);
+        
+        TypeMapping responseMapping = new TypeMapping(operation.getResponse().getResponseObject());
+        operationMapping.getResponseObjectMapping().add(responseMapping);
+        
+        return operationMapping;
     }
     
     protected boolean handleModeEvent(EditField eventSource, LinkedList<EditField> currentPageFields) {
