@@ -16,9 +16,16 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.List;
+
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.generator.wsdl.MongoDBWSDLGenerator;
+
+import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeGenerationContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.impl.generation.AbstractRuntimeMetadataGenerator;
+import oracle.tip.tools.ide.adapters.cloud.impl.generation.wsdl.WSDLGenerator;
 
 public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     

@@ -56,7 +56,8 @@ import org.bson.types.ObjectId;
 
 public class MongoDBMetadataParser implements MetadataParser {
     
-    private static final String[] operationNames = { "insert", "find" };
+    //private static final String[] operationNames = { "insert", "find" };
+    private static final String[] operationNames = { "insert" };
     
     private final LoggerService logger;
     
@@ -102,17 +103,12 @@ public class MongoDBMetadataParser implements MetadataParser {
         Set<String> keys = bson.keySet();
         for (String key: keys) {
             CloudDataObjectNode type = BSONDataTypeMapper.getDataObjectNode(bson.get(key));
+            // new FieldImpl(String name, CloudDataObjectNode fieldType, boolean array, boolean required, boolean nullable, boolean custom)
             bsonNode.addField(new FieldImpl(key, type, false, false, true, true));
         }
         
-        CloudDataObjectNode unstructuredDataType = new CloudDataObjectNodeImpl(null, new QName(DataType.STRING.getDataType()), ObjectCategory.BUILTIN, DataType.STRING);
-        FieldImpl kvField = new FieldImpl("kv", unstructuredDataType, true, true, false, true);
-        
-        CloudDataObjectNode unstructuredType = new CloudDataObjectNodeImpl(null, new QName(namespace, "Unstructured"), ObjectCategory.CUSTOM, DataType.OBJECT);
-        unstructuredType.addField(kvField);
-        
-        // new FieldImpl(String name, CloudDataObjectNode fieldType, boolean array, boolean required, boolean nullable, boolean custom)
-        bsonNode.addField(new FieldImpl("Unstructured", unstructuredType, false, false, true, true));
+        CloudDataObjectNode unstructuredType = new CloudDataObjectNodeImpl(null, new QName("http://www.w3.org/2001/XMLSchema", "anyType"), ObjectCategory.BUILTIN);
+        bsonNode.addField(new FieldImpl("_unstructured", unstructuredType, false, false, true, true));
         
         return bsonNode;
     }

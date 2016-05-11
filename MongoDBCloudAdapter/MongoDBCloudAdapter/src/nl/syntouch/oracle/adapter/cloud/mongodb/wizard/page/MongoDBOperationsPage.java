@@ -47,6 +47,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     
     private static final String bsonDescriptionKey = "UI.BSON.DESCRIPTION";
     private static final String bsonEditField = "bsonEF";
+    private static final String bsonErrorKey = "UI.BSON.ERROR";
     private static final String bsonHelpKey = "UI.BSON.HELP";
     private static final String bsonLabelKey = "UI.BSON.LABEL";
     
@@ -98,6 +99,18 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         }
         
         return false;
+    }
+    
+    protected void validateBson(LinkedList<EditField> currentPageFields, List<UIError> errors) {
+        EditField bsonEF = findEditField(currentPageFields, bsonEditField);
+        String bson = ((ITextAreaObject) bsonEF.getObject()).getValue();
+        
+        try {
+            Document doc = Document.parse(bson);
+        } catch (Exception ex) {
+            UIError parseError = new UIError(bsonEF.getName(), getText(bsonErrorKey) + ": " + ex.getMessage());
+            errors.add(parseError);
+        }
     }
     
     protected void updateTransformationModelBuilder(String operationName) {
@@ -221,7 +234,20 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     @Override
     public LinkedHashMap<String, UIError[]> validatePage(LinkedHashMap<String, ICloudAdapterPage> wizardPages,
                                                          LinkedList<EditField> currentPageFields) throws CloudAdapterException {
-        System.err.println("validatePage");
-        return null;
+        List<UIError> errors = new ArrayList<>();
+        LinkedHashMap<String, UIError[]> errorMap = new LinkedHashMap<>();
+        
+        EditField modeEF = findEditField(currentPageFields, modeEditField);
+        String mode = ((SelectObject) modeEF.getObject()).getSelectedValue();
+        
+        if (modeStructured.equals(mode)) {
+            validateBson(currentPageFields, errors);
+        }
+        
+        if (!errors.isEmpty()) {
+            errorMap.put(getPageId(), errors.toArray(new UIError[1]));
+        }
+        
+        return errorMap;
     }
 }

@@ -31,10 +31,10 @@ import oracle.tip.tools.adapters.cloud.api.CloudAdapterFilter;
 import oracle.tip.tools.adapters.cloud.api.ICloudAdapterPage;
 import oracle.tip.tools.adapters.cloud.impl.AbstractCloudAdapterUIBinding;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterConnectionPage;
-import oracle.tip.tools.adapters.cloud.impl.CloudAdapterOperationsPage;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterSummaryPage;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterWelcomePage;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.impl.generation.wsdl.WSDLOperationsBuilder;
 import oracle.tip.tools.ide.adapters.cloud.impl.plugin.AbstractCloudApplicationAdapter;
 
 public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
@@ -66,7 +66,6 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
         if (filter.isAddConnection()) {
             editPages.put(CloudAdapterConstants.CONNECTION_PAGE_ID, new CloudAdapterConnectionPage(this.context));
         }
-        //editPages.put(CloudAdapterConstants.OPERATIONS_PAGE_ID, new CloudAdapterOperationsPage(this.context));
         editPages.put(CloudAdapterConstants.OPERATIONS_PAGE_ID, new MongoDBOperationsPage(this.context));
         editPages.put(CloudAdapterConstants.SUMMARY_PAGE_ID, new CloudAdapterSummaryPage(this.context));
         
