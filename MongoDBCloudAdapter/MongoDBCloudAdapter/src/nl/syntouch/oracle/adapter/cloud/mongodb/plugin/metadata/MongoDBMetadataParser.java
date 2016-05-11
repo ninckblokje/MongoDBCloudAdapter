@@ -38,6 +38,7 @@ import oracle.tip.tools.ide.adapters.cloud.api.model.DataType;
 import oracle.tip.tools.ide.adapters.cloud.api.model.InvocationStyle;
 import oracle.tip.tools.ide.adapters.cloud.api.model.ObjectCategory;
 import oracle.tip.tools.ide.adapters.cloud.api.model.OperationResponse;
+import oracle.tip.tools.ide.adapters.cloud.api.model.RequestParameter;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.CloudApplicationModelImpl;
@@ -88,28 +89,30 @@ public class MongoDBMetadataParser implements MetadataParser {
         operation.setName("insert");
         operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
-        Document bson = getDocumentFromDataSource(dataSource);
-        
-        RequestParameterImpl request = new RequestParameterImpl();
-        request.setDataType(getData(bson, baseNamespace + "/insert"));
-        operation.getRequestParameters().add(request);
-        
-        operation.setResponse(getInsertResponse());
+        operation.getRequestParameters().add(getInsertRequest(dataSource, baseNamespace));
+        operation.setResponse(getInsertResponse(baseNamespace));
         
         return operation;
     }
     
-    protected CloudDataObjectNode getData(Document bson, String namespace) {
+    protected CloudDataObjectNode getDataObjectNode(Document bson, String namespace) {
         QName qName = new QName(namespace, "Document");
         CloudDataObjectNode bsonNode = new CloudDataObjectNodeImpl(null, qName, ObjectCategory.CUSTOM, DataType.OBJECT);
         
         Set<String> keys = bson.keySet();
         for (String key: keys) {
-            QName fieldQName = new QName(namespace, key);
-            System.err.println(bson.get(key).getClass().getName());
             CloudDataObjectNode type = BSONDataTypeMapper.getDataObjectNode(bson.get(key));
             bsonNode.addField(new FieldImpl(key, type, false, false, true, true));
         }
+        
+        CloudDataObjectNode unstructuredDataType = new CloudDataObjectNodeImpl(null, new QName(DataType.STRING.getDataType()), ObjectCategory.BUILTIN, DataType.STRING);
+        FieldImpl kvField = new FieldImpl("kv", unstructuredDataType, true, true, false, true);
+        
+        CloudDataObjectNode unstructuredType = new CloudDataObjectNodeImpl(null, new QName(namespace, "Unstructured"), ObjectCategory.CUSTOM, DataType.OBJECT);
+        unstructuredType.addField(kvField);
+        
+        // new FieldImpl(String name, CloudDataObjectNode fieldType, boolean array, boolean required, boolean nullable, boolean custom)
+        bsonNode.addField(new FieldImpl("Unstructured", unstructuredType, false, false, true, true));
         
         return bsonNode;
     }
@@ -122,17 +125,25 @@ public class MongoDBMetadataParser implements MetadataParser {
         }
     }
     
-    protected OperationResponse getFindResponse() {
-        return getInsertResponse();
+    protected RequestParameter getInsertRequest(DataSource dataSource, String baseNamespace) {
+        Document bson = getDocumentFromDataSource(dataSource);
+        
+        RequestParameterImpl request = new RequestParameterImpl();
+        request.setDataType(getDataObjectNode(bson, baseNamespace + "/insert/request"));
+        
+        return request;
     }
     
-    protected OperationResponse getInsertResponse() {
+    protected OperationResponse getInsertResponse(String baseNamespace) {
         OperationResponseImpl response = new OperationResponseImpl();
+        
+        Document bson = new Document().append("_id", new ObjectId());
+        
         
         response.setDescription("ObjectId of newly insert document");
         response.setName("_id");
         response.setQualifiedName(new QName("InsertResponseDocument"));
-        response.setResponseObject(new CloudDataObjectNodeImpl(null, new QName("_id"), ObjectCategory.CUSTOM, DataType.ID));
+        response.setResponseObject(getDataObjectNode(bson, baseNamespace + "/insert/response"));
         
         return response;
     }
