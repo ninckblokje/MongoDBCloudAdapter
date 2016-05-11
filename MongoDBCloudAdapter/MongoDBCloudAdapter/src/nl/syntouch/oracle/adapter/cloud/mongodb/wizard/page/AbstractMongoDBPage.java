@@ -21,6 +21,8 @@ import java.util.Locale;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.metadata.MongoDBMetadataBrowser;
+
 import oracle.tip.tools.adapters.cloud.utils.CloudAdapterUtils;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.CloudMetadataBrowser;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
@@ -65,8 +67,8 @@ public abstract class AbstractMongoDBPage {
         return logger;
     }
     
-    protected CloudMetadataBrowser getMetadataBrowser() {
-        return CloudAdapterUtils.getMetadataBrowser(ctx);
+    protected MongoDBMetadataBrowser getMetadataBrowser() {
+        return (MongoDBMetadataBrowser) CloudAdapterUtils.getMetadataBrowser(ctx);
     }
     
     protected String getText(String key) {

@@ -26,26 +26,20 @@ import javax.xml.namespace.QName;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataSource;
 
-import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataTypeMapper;
+import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParserException;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudApplicationModel;
-import oracle.tip.tools.ide.adapters.cloud.api.model.CloudDataObjectNode;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
-import oracle.tip.tools.ide.adapters.cloud.api.model.DataType;
 import oracle.tip.tools.ide.adapters.cloud.api.model.InvocationStyle;
-import oracle.tip.tools.ide.adapters.cloud.api.model.ObjectCategory;
 import oracle.tip.tools.ide.adapters.cloud.api.model.OperationResponse;
 import oracle.tip.tools.ide.adapters.cloud.api.model.RequestParameter;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.CloudApplicationModelImpl;
-import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.CloudDataObjectNodeImpl;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.CloudOperationNodeImpl;
-
-import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.FieldImpl;
 
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.OperationResponseImpl;
 
@@ -69,15 +63,12 @@ public class MongoDBMetadataParser implements MetadataParser {
     }
     
     protected void addOperation(CloudApplicationModel cloudApplicationModel, String operationName, DataSource dataSource) {
-        String mongoNamespace = (String) ctx.getContextObject(Constants.MONGO_NAMESPACE_KEY);
-        String baseNamespace = Constants.ADAPTER_NAME + "/" + mongoNamespace;
+        Document bson =  getDocument(dataSource);
         
         logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
         switch(operationName) {
-            case "find":
-                break;
             case "insert":
-                cloudApplicationModel.addOperation(getInsertOperation(dataSource, baseNamespace));
+                cloudApplicationModel.addOperation(getInsertOperation(bson, getBaseNamespace()));
                 break;
             default:
                 logger.log(LoggerService.Level.SEVERE, "Unable to add unknown operation [" + operationName + "]");
@@ -85,35 +76,23 @@ public class MongoDBMetadataParser implements MetadataParser {
         };
     }
     
-    protected CloudOperationNode getInsertOperation(DataSource dataSource, String baseNamespace) {
+    protected String getBaseNamespace() {
+        String mongoNamespace = (String) ctx.getContextObject(Constants.MONGO_NAMESPACE_KEY);
+        return Constants.ADAPTER_NAME + "/" + mongoNamespace;
+    }
+    
+    protected CloudOperationNode getInsertOperation(Document bson, String baseNamespace) {
         CloudOperationNodeImpl operation = new CloudOperationNodeImpl();
         operation.setName("insert");
         operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
-        operation.getRequestParameters().add(getInsertRequest(dataSource, baseNamespace));
+        operation.getRequestParameters().add(getInsertRequest(bson, baseNamespace));
         operation.setResponse(getInsertResponse(baseNamespace));
         
         return operation;
     }
     
-    protected CloudDataObjectNode getDataObjectNode(Document bson, String namespace) {
-        QName qName = new QName(namespace, "Document");
-        CloudDataObjectNode bsonNode = new CloudDataObjectNodeImpl(null, qName, ObjectCategory.CUSTOM, DataType.OBJECT);
-        
-        Set<String> keys = bson.keySet();
-        for (String key: keys) {
-            CloudDataObjectNode type = BSONDataTypeMapper.getDataObjectNode(bson.get(key));
-            // new FieldImpl(String name, CloudDataObjectNode fieldType, boolean array, boolean required, boolean nullable, boolean custom)
-            bsonNode.addField(new FieldImpl(key, type, false, false, true, true));
-        }
-        
-        CloudDataObjectNode unstructuredType = new CloudDataObjectNodeImpl(null, new QName("http://www.w3.org/2001/XMLSchema", "anyType"), ObjectCategory.BUILTIN);
-        bsonNode.addField(new FieldImpl("_unstructured", unstructuredType, false, false, true, true));
-        
-        return bsonNode;
-    }
-    
-    protected Document getDocumentFromDataSource(DataSource dataSource) {
+    protected Document getDocument(DataSource dataSource) {
         if (dataSource instanceof BSONDataSource) {
             return ((BSONDataSource) dataSource).getDocument();
         } else {
@@ -121,11 +100,9 @@ public class MongoDBMetadataParser implements MetadataParser {
         }
     }
     
-    protected RequestParameter getInsertRequest(DataSource dataSource, String baseNamespace) {
-        Document bson = getDocumentFromDataSource(dataSource);
-        
+    protected RequestParameter getInsertRequest(Document bson, String baseNamespace) {
         RequestParameterImpl request = new RequestParameterImpl();
-        request.setDataType(getDataObjectNode(bson, baseNamespace + "/insert/request"));
+        request.setDataType(BSONUtil.parseToDataObjectNode(bson, baseNamespace + "/insert/request"));
         
         return request;
     }
@@ -133,13 +110,12 @@ public class MongoDBMetadataParser implements MetadataParser {
     protected OperationResponse getInsertResponse(String baseNamespace) {
         OperationResponseImpl response = new OperationResponseImpl();
         
-        Document bson = new Document().append("_id", new ObjectId());
-        
+        Document bson = BSONUtil.getUnstructuredDocument();
         
         response.setDescription("ObjectId of newly insert document");
         response.setName("_id");
         response.setQualifiedName(new QName("InsertResponseDocument"));
-        response.setResponseObject(getDataObjectNode(bson, baseNamespace + "/insert/response"));
+        response.setResponseObject(BSONUtil.parseToDataObjectNode(bson, baseNamespace + "/insert/response"));
         
         return response;
     }

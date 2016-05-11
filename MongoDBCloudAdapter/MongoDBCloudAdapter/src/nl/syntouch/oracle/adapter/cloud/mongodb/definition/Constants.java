@@ -38,6 +38,9 @@ public class Constants {
     public static final String CONTEXT_PARSE_DOCUMENT_KEY = "MongoDB.parseBsonDocument";
     public static final String CONTEXT_SAMPLE_DOCUMENT_KEY = "MongoDB.sampleBsonDocument";
     
+    public static final String MODE_STRUCTURED = "structured";
+    public static final String MODE_UNSTRUCTURED = "unstructured";
+    
     public static String getText(Locale locale, String key) {
         return ResourceBundle.getBundle(resourceBundle, locale).getString(key);
     }

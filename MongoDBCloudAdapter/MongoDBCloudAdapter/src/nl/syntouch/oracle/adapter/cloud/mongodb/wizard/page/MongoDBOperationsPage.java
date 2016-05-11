@@ -22,6 +22,7 @@ import java.util.LinkedList;
 
 import java.util.List;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterException;
@@ -56,9 +57,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     private static final String modeHelpKey = "UI.MODE.HELP";
     private static final String modeLabelKey = "UI.MODE.LABEL";
     
-    private static final String modeStructured = "structured";
-    private static final String modeUnstructured = "unstructured";
-    private static final String[] modeArray = {modeStructured, modeUnstructured};
+    private static final String[] modeArray = {Constants.MODE_STRUCTURED, Constants.MODE_UNSTRUCTURED};
     
     private static final String operationsDescriptionKey = "UI.OPERATIONS.DESCRIPTION";
     private static final String operationsEditField = "operationsEF";
@@ -74,11 +73,12 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         super(adapterPluginContext);
     }
     
-    protected OperationMapping getOperationMapping(String operationName) {
+    protected OperationMapping getOperationMapping(String operationName, String mode, Document bson) {
         CloudOperationNode operation = getMetadataBrowser().getOperation(operationName);
         OperationMapping operationMapping = new OperationMapping(operation, ObjectGrouping.ORDERED, ObjectGrouping.ORDERED, null);
         
-        TypeMapping requestMapping = new TypeMapping(operation.getRequestParameters().get(0).getDataType());
+        String namespace = operation.getRequestParameters().get(0).getDataType().getQualifiedName().getNamespaceURI();
+        TypeMapping requestMapping = (Constants.MODE_STRUCTURED.equals(mode)) ? new TypeMapping(BSONUtil.parseToDataObjectNode(bson, namespace)) : new TypeMapping(BSONUtil.parseToDataObjectNode(BSONUtil.getUnstructuredDocument(), namespace));
         operationMapping.getRequestObjectMappings().add(requestMapping);
         
         TypeMapping responseMapping = new TypeMapping(operation.getResponse().getResponseObject());
@@ -92,7 +92,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         String selectedMode = modeSelect.getSelectedValue();
         
         EditField bsonEF = findEditField(currentPageFields, bsonEditField);
-        if (modeStructured.equals(selectedMode)) {
+        if (Constants.MODE_STRUCTURED.equals(selectedMode)) {
             bsonEF.setDisabled(false);
         } else {
             bsonEF.setDisabled(true);
@@ -113,10 +113,10 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         }
     }
     
-    protected void updateTransformationModelBuilder(String operationName) {
+    protected void updateTransformationModelBuilder(String operationName, String mode, Document bson) {
         TransformationModelBuilder modelBuilder = getTransformationModelBuilder();
         
-        modelBuilder.addOperationMapping(getOperationMapping(operationName));
+        modelBuilder.addOperationMapping(getOperationMapping(operationName, mode, bson));
     }
     
     @Override
@@ -198,13 +198,13 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         
         EditField modeEF = findEditField(currentPageFields, modeEditField);
         String mode = ((SelectObject) modeEF.getObject()).getSelectedValue();
-        getContext().setContextObject(Constants.CONTEXT_OPERATION_KEY, mode);
+        getContext().setContextObject(Constants.CONTEXT_MODE_KEY, mode);
         
         EditField bsonEF = findEditField(currentPageFields, bsonEditField);
-        String bson = ((ITextAreaObject) bsonEF.getObject()).getValue();
+        Document bson = Document.parse(((ITextAreaObject) bsonEF.getObject()).getValue());
         getContext().setContextObject(Constants.CONTEXT_PARSE_DOCUMENT_KEY, bson);
         
-        updateTransformationModelBuilder(operation);
+        updateTransformationModelBuilder(operation, mode, bson);
         
         CloudAdapterPageState state = new CloudAdapterPageState(false, wizardPages, currentPageFields);
         return state;
@@ -240,7 +240,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         EditField modeEF = findEditField(currentPageFields, modeEditField);
         String mode = ((SelectObject) modeEF.getObject()).getSelectedValue();
         
-        if (modeStructured.equals(mode)) {
+        if (Constants.MODE_STRUCTURED.equals(mode)) {
             validateBson(currentPageFields, errors);
         }
         
