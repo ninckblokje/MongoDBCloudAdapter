@@ -48,7 +48,7 @@ public class MongoDBJcaEndpoint extends JcaEndpointAbstract {
             return null;
         }
         EndpointInfo endpointInfo = this.controller.getEndpointInfo(serviceName);
-
+        
         return endpointInfo;
     }
 

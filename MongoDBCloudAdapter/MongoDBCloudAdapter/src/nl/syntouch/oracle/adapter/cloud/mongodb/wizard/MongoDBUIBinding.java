@@ -34,7 +34,6 @@ import oracle.tip.tools.adapters.cloud.impl.CloudAdapterConnectionPage;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterSummaryPage;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterWelcomePage;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
-import oracle.tip.tools.ide.adapters.cloud.impl.generation.wsdl.WSDLOperationsBuilder;
 import oracle.tip.tools.ide.adapters.cloud.impl.plugin.AbstractCloudApplicationAdapter;
 
 public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {

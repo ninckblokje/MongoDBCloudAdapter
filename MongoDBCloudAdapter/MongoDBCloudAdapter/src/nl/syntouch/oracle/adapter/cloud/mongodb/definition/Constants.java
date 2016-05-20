@@ -23,7 +23,7 @@ public class Constants {
     
     private static final String resourceBundle = "nl.syntouch.oracle.adapter.cloud.mongodb.definition.MongoDBCloudAdapterBundle";
     
-    public static final String ADAPTER_NAME = "MongoDBAdapter";
+    public static final String ADAPTER_NAME = "MongoDBCloudAdapter";
     public static final String VERSION = "1";
     
     public static final String CSFKEY_KEY = "csfkey";
