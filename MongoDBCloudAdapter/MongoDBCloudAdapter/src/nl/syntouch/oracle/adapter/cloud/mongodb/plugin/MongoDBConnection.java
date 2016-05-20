@@ -18,9 +18,10 @@ limitations under the License.
 
 import com.mongodb.MongoClient;
 import com.mongodb.MongoClientURI;
-import com.mongodb.MongoNamespace;
 import com.mongodb.client.MongoCollection;
 import com.mongodb.client.MongoDatabase;
+
+import java.util.Set;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
@@ -65,6 +66,7 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
         MongoClientURI uri = new MongoClientURI(mongoUri);
         client = new MongoClient(uri);
         
+        logger.log(LoggerService.Level.INFO, "Retrieving collection [" + mongoCollection + "] from database [" + mongoDb + "]");
         db = client.getDatabase(mongoDb);
         collection = db.getCollection(mongoCollection);
         
@@ -84,6 +86,16 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
     @Override
     public AuthenticationScheme getAuthenticationScheme() {
         return new MongoDBAuthenticationScheme(ctx, this);
+    }
+    
+    @Override
+    public Set<String> getPersistentPropertyNames() {
+        Set<String> propNames = super.getPersistentPropertyNames();
+        
+        propNames.add(Constants.MONGO_DB_KEY);
+        propNames.add(Constants.MONGO_COLLECTION_KEY);
+        
+        return propNames;
     }
 
     @Override
