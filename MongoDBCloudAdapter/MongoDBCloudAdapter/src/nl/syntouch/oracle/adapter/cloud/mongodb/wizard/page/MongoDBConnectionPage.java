@@ -39,7 +39,10 @@ public class MongoDBConnectionPage extends CloudAdapterConnectionPage {
     
     protected void addMissingData(LinkedList<EditField> fields, String fieldName, String contextKey) {
         Map<String, String> connProps = getConnectionProperties();
+        if (connProps == null) return;
+        
         String value = connProps.get(contextKey);
+        if (value == null) return;
         
         for (EditField field: fields) {
             if (fieldName.equals(field.getName())
@@ -52,6 +55,7 @@ public class MongoDBConnectionPage extends CloudAdapterConnectionPage {
 
     @SuppressWarnings("unchecked")
     protected Map<String, String> getConnectionProperties() {
+        // only available in edit mode
         return (Map<String, String>) ctx.getContextObject("connectionProperties");
     }
     

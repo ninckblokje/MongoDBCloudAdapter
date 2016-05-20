@@ -38,6 +38,7 @@ import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.TransformationMod
 import oracle.tip.tools.presentation.uiobjects.sdk.EditField;
 import oracle.tip.tools.presentation.uiobjects.sdk.ITextAreaObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.SelectObject;
+import oracle.tip.tools.presentation.uiobjects.sdk.TextAreaObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIError;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIFactory;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIObject;
@@ -114,9 +115,11 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     }
     
     protected void updateTransformationModelBuilder(String operationName, String mode, Document bson) {
-        TransformationModelBuilder modelBuilder = getTransformationModelBuilder();
+        TransformationModelBuilder modelBuilder = new TransformationModelBuilder(getContext());
         
         modelBuilder.addOperationMapping(getOperationMapping(operationName, mode, bson));
+        
+        setTransformationModelBuilder(modelBuilder);
     }
     
     @Override
@@ -156,7 +159,7 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
         operationNamesArray = operationNames.toArray(operationNamesArray);
         
         // String[] values, String[] formattedValues, String selected, int displayMode, boolean hasEvents
-        UIObject operationsSelect = UIFactory.createSelectObject(operationNamesArray, operationNamesArray,
+        SelectObject operationsSelect = UIFactory.createSelectObject(operationNamesArray, operationNamesArray,
                                                                  operationNamesArray[0], 2, true);
         // String name, String label, String description, boolean isrequired, boolean isDisabled, UIObject object, EditField.LabelFieldLayout labelFieldLayout, String helpText, EditField.LabelFieldAlignment oneRowlabelFieldAlignment
         fields.add(UIFactory.createEditField(operationsEditField, getText(operationsLabelKey),
@@ -164,19 +167,26 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
                                              operationsSelect, EditField.LabelFieldLayout.ONE_ROW_LAYOUT,
                                              getText(operationsHelpKey), EditField.LabelFieldAlignment.LEFT_LEFT));
         
-        UIObject modeSelect = UIFactory.createSelectObject(modeArray, modeArray,
+        SelectObject modeSelect = UIFactory.createSelectObject(modeArray, modeArray,
                                                                  modeArray[0], 2, true);
-        fields.add(UIFactory.createEditField(modeEditField, getText(modeLabelKey),
+        EditField modeSelectEF = UIFactory.createEditField(modeEditField, getText(modeLabelKey),
                                              getText(modeDescriptionKey), true, false,
                                              modeSelect, EditField.LabelFieldLayout.ONE_ROW_LAYOUT,
-                                             getText(modeHelpKey), EditField.LabelFieldAlignment.LEFT_LEFT));
+                                             getText(modeHelpKey), EditField.LabelFieldAlignment.LEFT_LEFT);
+        fields.add(modeSelectEF);
+        
+        if (getContext().getContextObject(Constants.CONTEXT_MODE_KEY) != null) {
+            modeSelect.setSelectedValue((String) getContext().getContextObject(Constants.CONTEXT_MODE_KEY));
+        }
         
         Document bson = (Document) getContext().getContextObject(Constants.CONTEXT_SAMPLE_DOCUMENT_KEY);
-        UIObject bsonTextArea = UIFactory.createTextArea(bson.toJson(), 40, 15, false);
+        TextAreaObject bsonTextArea = UIFactory.createTextArea(bson.toJson(), 40, 15, false);
         fields.add(UIFactory.createEditField(bsonEditField, getText(bsonLabelKey),
                                              getText(bsonDescriptionKey), false, false,
                                              bsonTextArea, EditField.LabelFieldLayout.ONE_ROW_LAYOUT,
                                              getText(bsonHelpKey), EditField.LabelFieldAlignment.LEFT_LEFT));
+        
+        handleModeEvent(modeSelectEF, fields);
         
         return fields;
     }

@@ -15,17 +15,12 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.generator.wsdl.MongoDBWSDLGenerator;
-
-import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;
+import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeGenerationContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.impl.generation.AbstractRuntimeMetadataGenerator;
-import oracle.tip.tools.ide.adapters.cloud.impl.generation.wsdl.WSDLGenerator;
 
 public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     
@@ -35,9 +30,15 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
         super(adapterPluginContext);
         ctx = adapterPluginContext;
     }
+    
+    protected CloudConnection getCloudConnection() {
+        return this.connection;
+    }
 
     @Override
     protected void initializeContext(RuntimeGenerationContext runtimeGenerationContext) {
-        // TODO Implement this method
+        CloudConnection connection = getCloudConnection();
+        
+        connection.getConnectionProperties().setProperty(Constants.CONTEXT_MODE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_MODE_KEY));
     }
 }

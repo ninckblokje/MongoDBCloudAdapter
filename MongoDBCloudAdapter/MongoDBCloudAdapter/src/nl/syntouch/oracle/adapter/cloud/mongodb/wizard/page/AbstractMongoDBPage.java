@@ -19,11 +19,15 @@ limitations under the License.
 import java.util.LinkedList;
 import java.util.Locale;
 
+import java.util.Map;
+
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.metadata.MongoDBMetadataBrowser;
 
 import oracle.tip.tools.adapters.cloud.utils.CloudAdapterUtils;
+import oracle.tip.tools.ide.adapters.cloud.api.connection.AbstractCloudConnection;
+import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.CloudMetadataBrowser;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
@@ -55,6 +59,16 @@ public abstract class AbstractMongoDBPage {
         return eventSource;
     }
     
+    protected CloudConnection getCloudConnection() {
+        return (CloudConnection) ctx.getContextObject("CA_UI_connection");
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected Map<String, String> getConnectionProperties() {
+        // only available in edit mode
+        return (Map<String, String>) ctx.getContextObject("connectionProperties");
+    }
+    
     protected AdapterPluginContext getContext() {
         return ctx;
     }
@@ -77,5 +91,9 @@ public abstract class AbstractMongoDBPage {
     
     protected TransformationModelBuilder getTransformationModelBuilder() {
         return (TransformationModelBuilder) ctx.getContextObject("_ui_ModelBuilder");
+    }
+    
+    protected void setTransformationModelBuilder(TransformationModelBuilder modelBuilder) {
+        ctx.setContextObject("_ui_ModelBuilder", modelBuilder);
     }
 }

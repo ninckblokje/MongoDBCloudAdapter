@@ -19,6 +19,8 @@ limitations under the License.
 import java.util.LinkedHashMap;
 import java.util.Locale;
 
+import java.util.Map;
+
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBAdapter;
@@ -41,6 +43,13 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
     public MongoDBUIBinding(CloudAdapterFilter cloudAdapterFilter, Locale locale) throws CloudAdapterException {
         super(cloudAdapterFilter, locale, Constants.ADAPTER_NAME);
         initUIBinding();
+        updateContext();
+    }
+    
+    @SuppressWarnings("unchecked")
+    protected Map<String, String> getConnectionProperties() {
+        // only available in edit mode
+        return (Map<String, String>) context.getContextObject("connectionProperties");
     }
     
     protected void initUIBinding() {
@@ -53,6 +62,12 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
             ex.printStackTrace();
             throw new CloudAdapterException(ex);
         }
+    }
+    
+    protected void updateContext() {
+        if (getConnectionProperties() ==null) return;
+        
+        if (getConnectionProperties().containsKey(Constants.CONTEXT_MODE_KEY)) context.setContextObject(Constants.CONTEXT_MODE_KEY, getConnectionProperties().get(Constants.CONTEXT_MODE_KEY));
     }
 
     @Override
