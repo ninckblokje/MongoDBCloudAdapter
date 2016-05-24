@@ -37,6 +37,7 @@ public class Constants {
     public static final String CONTEXT_OPERATION_KEY = "MongoDB.operation";
     public static final String CONTEXT_PARSE_DOCUMENT_KEY = "MongoDB.parseBsonDocument";
     public static final String CONTEXT_SAMPLE_DOCUMENT_KEY = "MongoDB.sampleBsonDocument";
+    public static final String CONTEXT_SAMPLE_FILE_KEY = "MongoDB.sampleBsonFile";
     
     public static final String MODE_STRUCTURED = "structured";
     public static final String MODE_UNSTRUCTURED = "unstructured";

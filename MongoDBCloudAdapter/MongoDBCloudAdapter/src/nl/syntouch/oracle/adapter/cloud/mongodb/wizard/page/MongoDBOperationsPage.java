@@ -25,6 +25,8 @@ import java.util.List;
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
+import oracle.j2ee.ws.common.processor.modeler.wsdl.OperationModeler;
+
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterException;
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterPageState;
 import oracle.tip.tools.adapters.cloud.api.ICloudAdapterPage;
@@ -32,6 +34,7 @@ import oracle.tip.tools.ide.adapters.cloud.api.metadata.ObjectGrouping;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.OperationMapping;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.TypeMapping;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
+import oracle.tip.tools.ide.adapters.cloud.api.model.TransformationModel;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.TransformationModelBuilder;
@@ -115,9 +118,18 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     }
     
     protected void updateTransformationModelBuilder(String operationName, String mode, Document bson) {
-        TransformationModelBuilder modelBuilder = new TransformationModelBuilder(getContext());
+        TransformationModelBuilder modelBuilder = getTransformationModelBuilder();
+        TransformationModel model = modelBuilder.build();
         
-        modelBuilder.addOperationMapping(getOperationMapping(operationName, mode, bson));
+        if (model.getOperationMappings().isEmpty()) {
+            modelBuilder.addOperationMapping(getOperationMapping(operationName, mode, bson));
+        } else {
+            OperationMapping operationMapping = model.getOperationMappings().get(0);
+            OperationMapping newOperationMapping = getOperationMapping(operationName, mode, bson);
+            
+            operationMapping.setTargetOperation(newOperationMapping.getTargetOperation());
+            operationMapping.setNewOperationName(newOperationMapping.getNewOperationName());
+        }
         
         setTransformationModelBuilder(modelBuilder);
     }
