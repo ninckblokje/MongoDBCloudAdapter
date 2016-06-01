@@ -28,10 +28,10 @@ public class Constants {
     
     public static final String CSFKEY_KEY = "csfkey";
     
-    public static final String MONGO_COLLECTION_KEY = "mongoCollection";
-    public static final String MONGO_DB_KEY = "mongoDb";
+    public static final String MONGO_COLLECTION_KEY = "MongoDB.collection";
+    public static final String MONGO_DB_KEY = "MongoDB.db";
     public static final String MONGO_NAMESPACE_KEY = "mongoNamespace";
-    public static final String MONGO_URI_KEY = "mongoUri";
+    public static final String MONGO_URI_KEY = "MongoDB.uri";
     
     public static final String CONTEXT_MODE_KEY = "MongoDB.mode";
     public static final String CONTEXT_OPERATION_KEY = "MongoDB.operation";

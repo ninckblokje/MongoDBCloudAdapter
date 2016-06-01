@@ -83,6 +83,7 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
             URI dirUri = new URI(dirLocation);
             
             String fileName = (String) adapterPluginContext.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY);
+            if (fileName == null) return null;
             
             File dir = new File(dirUri);
             File f = new File(dir, fileName);
@@ -123,7 +124,11 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
                                  AdapterPluginContext adapterPluginContext) throws CloudApplicationAdapterException {
         
         CloudApplicationModel cloudApplicationModel = getModel();
-        Document bson = (adapterPluginContext.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY) != null) ? getStoredDocument(adapterPluginContext) : getSampleDocument(adapterPluginContext);
+        Document bson = getStoredDocument(adapterPluginContext);
+        if (bson == null) {
+            bson = getSampleDocument(adapterPluginContext);
+        }
+        
         adapterPluginContext.setContextObject(Constants.CONTEXT_SAMPLE_DOCUMENT_KEY, bson);
         DataSource dataSource = new BSONDataSource(bson, StandardCharsets.UTF_8.toString());
         Properties props = new Properties();

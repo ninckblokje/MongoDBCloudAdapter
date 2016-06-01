@@ -36,10 +36,6 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     public MongoDBMetadataGenerator(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
         ctx = adapterPluginContext;
-        
-        if (ctx.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY) == null) {
-            ctx.setContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY, UUID.randomUUID().toString() + ".json");
-        }
     }
     
     protected CloudConnection getCloudConnection() {
@@ -57,6 +53,10 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
         CloudConnection connection = getCloudConnection();
         
         connection.getConnectionProperties().setProperty(Constants.CONTEXT_MODE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_MODE_KEY));
+        
+        if (ctx.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY) == null) {
+            ctx.setContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY, UUID.randomUUID().toString() + ".json");
+        }
         connection.getConnectionProperties().setProperty(Constants.CONTEXT_SAMPLE_FILE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY));
     }
 }

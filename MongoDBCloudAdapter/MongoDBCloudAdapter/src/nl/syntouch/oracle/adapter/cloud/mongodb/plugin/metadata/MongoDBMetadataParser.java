@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 
@@ -28,6 +29,8 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
+
+import oracle.cloud.connector.api.CloudOperation;
 
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParserException;
@@ -68,7 +71,7 @@ public class MongoDBMetadataParser implements MetadataParser {
         logger.log(LoggerService.Level.INFO, "Adding operation [" + operationName + "] to CloudApplicationModel");
         switch(operationName) {
             case "insert":
-                cloudApplicationModel.addOperation(getInsertOperation(bson, getBaseNamespace()));
+                cloudApplicationModel.addOperation(getInsertOperation(cloudApplicationModel, bson, getBaseNamespace()));
                 break;
             default:
                 logger.log(LoggerService.Level.SEVERE, "Unable to add unknown operation [" + operationName + "]");
@@ -81,8 +84,10 @@ public class MongoDBMetadataParser implements MetadataParser {
         return Constants.ADAPTER_NAME + "/" + mongoNamespace;
     }
     
-    protected CloudOperationNode getInsertOperation(Document bson, String baseNamespace) {
-        CloudOperationNodeImpl operation = new CloudOperationNodeImpl();
+    protected CloudOperationNode getInsertOperation(CloudApplicationModel cloudApplicationModel, Document bson, String baseNamespace) {
+        CloudOperationNodeImpl existingOperation = (CloudOperationNodeImpl) getExistingOperation(cloudApplicationModel, "insert");
+        
+        CloudOperationNodeImpl operation = (existingOperation == null) ? new CloudOperationNodeImpl() : existingOperation;
         operation.setName("insert");
         operation.setInvocationStyle(InvocationStyle.REQUEST_RESPONSE);
         
@@ -123,6 +128,15 @@ public class MongoDBMetadataParser implements MetadataParser {
     protected String getObjectId(Document bson) {
         ObjectId id = bson.getObjectId("_id");
         return id.toString();
+    }
+    
+    protected CloudOperationNode getExistingOperation(CloudApplicationModel cloudApplicationModel, String operationName) {
+        List<CloudOperationNode> operations = cloudApplicationModel.getOperations();
+        for (CloudOperationNode operation: operations) {
+            if (operationName.equals(operation.getName())) return operation;
+        }
+        
+        return null;
     }
     
     @Override
