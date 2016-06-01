@@ -24,7 +24,7 @@ import javax.activation.DataSource;
 
 import javax.xml.namespace.QName;
 
-import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataSource;
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;

@@ -68,6 +68,7 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
         if (getConnectionProperties() ==null) return;
         
         if (getConnectionProperties().containsKey(Constants.CONTEXT_MODE_KEY)) context.setContextObject(Constants.CONTEXT_MODE_KEY, getConnectionProperties().get(Constants.CONTEXT_MODE_KEY));
+        if (getConnectionProperties().containsKey(Constants.CONTEXT_SAMPLE_FILE_KEY)) context.setContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY, getConnectionProperties().get(Constants.CONTEXT_SAMPLE_FILE_KEY));
     }
 
     @Override

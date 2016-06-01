@@ -16,7 +16,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.io.File;
+import java.io.IOException;
+
+import java.net.URI;
+import java.net.URISyntaxException;
+
 import java.nio.charset.StandardCharsets;
+
+import java.nio.file.Files;
+
+import java.nio.file.Paths;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,7 +36,7 @@ import java.util.Properties;
 
 import javax.activation.DataSource;
 
-import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONDataSource;
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBConnection;
@@ -61,11 +71,26 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
         try {
             connection.connect();
             Document sample = connection.getCollection().find().first();
-            
-            adapterPluginContext.setContextObject(Constants.CONTEXT_SAMPLE_DOCUMENT_KEY, sample);
             return sample;
         } finally {
             connection.close();
+        }
+    }
+    
+    protected Document getStoredDocument(AdapterPluginContext adapterPluginContext) throws CloudApplicationAdapterException {
+        try {
+            String dirLocation = (String) adapterPluginContext.getContextObject("generatedBaseDir");
+            URI dirUri = new URI(dirLocation);
+            
+            String fileName = (String) adapterPluginContext.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY);
+            
+            File dir = new File(dirUri);
+            File f = new File(dir, fileName);
+            
+            byte[] data = Files.readAllBytes(Paths.get(f.toURI()));
+            return Document.parse(new String(data, "UTF-8"));
+        } catch (IOException | URISyntaxException ex) {
+            throw new CloudApplicationAdapterException(ex);
         }
     }
 
@@ -98,7 +123,9 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
                                  AdapterPluginContext adapterPluginContext) throws CloudApplicationAdapterException {
         
         CloudApplicationModel cloudApplicationModel = getModel();
-        DataSource dataSource = new BSONDataSource(getSampleDocument(adapterPluginContext), StandardCharsets.UTF_8.toString());
+        Document bson = (adapterPluginContext.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY) != null) ? getStoredDocument(adapterPluginContext) : getSampleDocument(adapterPluginContext);
+        adapterPluginContext.setContextObject(Constants.CONTEXT_SAMPLE_DOCUMENT_KEY, bson);
+        DataSource dataSource = new BSONDataSource(bson, StandardCharsets.UTF_8.toString());
         Properties props = new Properties();
         
         metadataParser.parse(dataSource, cloudApplicationModel, props);

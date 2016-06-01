@@ -1,4 +1,4 @@
-package nl.syntouch.oracle.adapter.cloud.mongodb.bson;
+package nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson;
 
 /*
 Copyright 2016 SynTouch B.V.

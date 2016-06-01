@@ -17,7 +17,11 @@ limitations under the License.
 */
 import java.util.List;
 
+import java.util.UUID;
+
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
+
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONArtifactGenerator;
 
 import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;
@@ -32,6 +36,10 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     public MongoDBMetadataGenerator(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
         ctx = adapterPluginContext;
+        
+        if (ctx.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY) == null) {
+            ctx.setContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY, UUID.randomUUID().toString() + ".json");
+        }
     }
     
     protected CloudConnection getCloudConnection() {
@@ -41,7 +49,7 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
     @Override
     protected void addArtifactGenerators(List<ArtifactGenerator> generators) {
         super.addArtifactGenerators(generators);
-        generators.add(new BSONArtifactGenerator(null));
+        generators.add(new BSONArtifactGenerator());
     }
 
     @Override
@@ -49,5 +57,6 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
         CloudConnection connection = getCloudConnection();
         
         connection.getConnectionProperties().setProperty(Constants.CONTEXT_MODE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_MODE_KEY));
+        connection.getConnectionProperties().setProperty(Constants.CONTEXT_SAMPLE_FILE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_SAMPLE_FILE_KEY));
     }
 }

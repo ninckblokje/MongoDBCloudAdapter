@@ -96,6 +96,7 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
         propNames.add(Constants.MONGO_COLLECTION_KEY);
         
         propNames.add(Constants.CONTEXT_MODE_KEY);
+        propNames.add(Constants.CONTEXT_SAMPLE_FILE_KEY);
         
         return propNames;
     }
