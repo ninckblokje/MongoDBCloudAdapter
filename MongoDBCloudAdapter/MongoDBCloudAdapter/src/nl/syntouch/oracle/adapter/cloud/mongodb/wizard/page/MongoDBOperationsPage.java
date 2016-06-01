@@ -127,6 +127,11 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
             OperationMapping operationMapping = model.getOperationMappings().get(0);
             OperationMapping newOperationMapping = getOperationMapping(operationName, mode, bson);
             
+            operationMapping.getRequestObjectMappings().clear();
+            operationMapping.setRequestObjectMappings(newOperationMapping.getRequestObjectMappings());
+            
+            operationMapping.setResponseObjectMapping(newOperationMapping.getResponseObjectMapping());
+            
             operationMapping.setTargetOperation(newOperationMapping.getTargetOperation());
             operationMapping.setNewOperationName(newOperationMapping.getNewOperationName());
         }
