@@ -25,7 +25,7 @@ limitations under the License.
     <defaultSecurityPolicy>CUSTOM</defaultSecurityPolicy>
     <propertyDefinitions>
         <propertyDefinition>
-            <propertyName>mongoUri</propertyName>
+            <propertyName>MongoDB.uri</propertyName>
             <propertyType>STRING</propertyType>
             <propertyGroup>CREDENTIALS</propertyGroup>
             <required>true</required>
@@ -33,7 +33,7 @@ limitations under the License.
             <displayName>Mongo URI, example: mongodb://localhost:27017</displayName>
         </propertyDefinition>
         <propertyDefinition>
-            <propertyName>mongoDb</propertyName>
+            <propertyName>MongoDB.db</propertyName>
             <propertyType>STRING</propertyType>
             <propertyGroup>CONNECTION_PROPS</propertyGroup>
             <required>true</required>
@@ -41,7 +41,7 @@ limitations under the License.
             <displayName>Database</displayName>
         </propertyDefinition>
         <propertyDefinition>
-            <propertyName>mongoCollection</propertyName>
+            <propertyName>MongoDB.collection</propertyName>
             <propertyType>STRING</propertyType>
             <propertyGroup>CONNECTION_PROPS</propertyGroup>
             <required>true</required>
