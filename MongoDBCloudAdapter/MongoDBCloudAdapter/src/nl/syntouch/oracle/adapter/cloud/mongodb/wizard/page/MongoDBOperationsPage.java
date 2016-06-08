@@ -25,8 +25,6 @@ import java.util.List;
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
-import oracle.j2ee.ws.common.processor.modeler.wsdl.OperationModeler;
-
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterException;
 import oracle.tip.tools.adapters.cloud.api.CloudAdapterPageState;
 import oracle.tip.tools.adapters.cloud.api.ICloudAdapterPage;
@@ -44,7 +42,6 @@ import oracle.tip.tools.presentation.uiobjects.sdk.SelectObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.TextAreaObject;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIError;
 import oracle.tip.tools.presentation.uiobjects.sdk.UIFactory;
-import oracle.tip.tools.presentation.uiobjects.sdk.UIObject;
 
 import org.bson.Document;
 
@@ -210,7 +207,6 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
 
     @Override
     public LinkedHashMap<String, ICloudAdapterPage> getChildrenEditPages() {
-        System.err.println("getChildrenEditPages");
         // TODO Implement this method
         return null;
     }
@@ -218,7 +214,6 @@ public class MongoDBOperationsPage extends AbstractMongoDBPage implements ICloud
     @Override
     public CloudAdapterPageState updateBackEndModel(LinkedHashMap<String, ICloudAdapterPage> wizardPages,
                                                     LinkedList<EditField> currentPageFields) throws CloudAdapterException {
-        
         EditField operationsEF = findEditField(currentPageFields, operationsEditField);
         String operation = ((SelectObject) operationsEF.getObject()).getSelectedValue();
         getContext().setContextObject(Constants.CONTEXT_OPERATION_KEY, operation);

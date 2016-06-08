@@ -20,8 +20,6 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.sb.tooling.ide.sca.internal.model.jca.SCAEndpointJcaAdapter;
 
-import oracle.tip.tools.ide.fabric.api.SCAEndpointAbstract;
-
 public class MongoDBSCAEndpointJcaAdapter extends SCAEndpointJcaAdapter {
     
     public MongoDBSCAEndpointJcaAdapter() {

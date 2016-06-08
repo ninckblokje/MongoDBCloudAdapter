@@ -29,8 +29,6 @@ import java.nio.file.Paths;
 
 import java.nio.file.StandardOpenOption;
 
-import java.util.UUID;
-
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;

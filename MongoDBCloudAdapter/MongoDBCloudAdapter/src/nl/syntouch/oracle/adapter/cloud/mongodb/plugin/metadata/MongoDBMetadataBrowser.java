@@ -48,17 +48,22 @@ import oracle.tip.tools.ide.adapters.cloud.api.model.CloudApplicationModel;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudOperationNode;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapterException;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.metadata.wsdl.AbstractMetadataBrowser;
 
 import org.bson.Document;
 
 public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
     
+    private final LoggerService logger;
+    
     private AdapterPluginContext ctx;
     
     public MongoDBMetadataBrowser(CloudConnection cloudConnection, AdapterPluginContext adapterPluginContext) {
         super(cloudConnection, adapterPluginContext);
         ctx = adapterPluginContext;
+        
+        logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
     
     protected Document getSampleDocument(AdapterPluginContext adapterPluginContext) {
@@ -122,7 +127,6 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
     @Override
     protected void parseMetadata(MetadataParser metadataParser,
                                  AdapterPluginContext adapterPluginContext) throws CloudApplicationAdapterException {
-        
         CloudApplicationModel cloudApplicationModel = getModel();
         Document bson = getStoredDocument(adapterPluginContext);
         if (bson == null) {

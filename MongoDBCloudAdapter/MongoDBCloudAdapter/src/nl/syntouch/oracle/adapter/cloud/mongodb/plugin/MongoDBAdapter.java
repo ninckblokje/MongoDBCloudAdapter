@@ -25,15 +25,20 @@ import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeMetadataGenerator;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.CloudMetadataBrowser;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.plugin.AbstractCloudApplicationAdapter;
 
 public class MongoDBAdapter extends AbstractCloudApplicationAdapter {
+    
+    private final LoggerService logger;
     
     private final AdapterPluginContext ctx;
     
     public MongoDBAdapter(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
         ctx = adapterPluginContext;
+        
+        logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
 
     @Override

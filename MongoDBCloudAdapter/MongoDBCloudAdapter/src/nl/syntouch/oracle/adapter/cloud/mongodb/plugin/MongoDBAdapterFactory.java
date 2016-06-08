@@ -21,6 +21,7 @@ import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapter;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapterException;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.CloudApplicationAdapterFactory;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 
 public class MongoDBAdapterFactory implements CloudApplicationAdapterFactory {
     

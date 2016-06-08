@@ -24,17 +24,21 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterConnectionPage;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.presentation.uiobjects.sdk.EditField;
 import oracle.tip.tools.presentation.uiobjects.sdk.ITextBoxObject;
 
 public class MongoDBConnectionPage extends CloudAdapterConnectionPage {
     
+    private final LoggerService logger;
+    
     private AdapterPluginContext ctx;
     
     public MongoDBConnectionPage(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
-        
         ctx = adapterPluginContext;
+        
+        logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
     
     protected void addMissingData(LinkedList<EditField> fields, String fieldName, String contextKey) {

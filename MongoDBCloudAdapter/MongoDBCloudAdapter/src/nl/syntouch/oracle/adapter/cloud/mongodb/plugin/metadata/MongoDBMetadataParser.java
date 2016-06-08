@@ -30,8 +30,6 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
-import oracle.cloud.connector.api.CloudOperation;
-
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParserException;
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudApplicationModel;
@@ -62,6 +60,7 @@ public class MongoDBMetadataParser implements MetadataParser {
     
     public MongoDBMetadataParser(AdapterPluginContext adapterPluginContext) {
         ctx = adapterPluginContext;
+        
         logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
     

@@ -15,6 +15,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 */
+
 import java.util.List;
 
 import java.util.UUID;
@@ -27,15 +28,20 @@ import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeGenerationContext;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.generation.AbstractRuntimeMetadataGenerator;
 
 public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
+    
+    private final LoggerService logger;
     
     private AdapterPluginContext ctx;
     
     public MongoDBMetadataGenerator(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext);
         ctx = adapterPluginContext;
+        
+        logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
     
     protected CloudConnection getCloudConnection() {

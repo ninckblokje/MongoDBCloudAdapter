@@ -36,6 +36,7 @@ import oracle.tip.tools.adapters.cloud.impl.AbstractCloudAdapterUIBinding;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterSummaryPage;
 import oracle.tip.tools.adapters.cloud.impl.CloudAdapterWelcomePage;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.plugin.AbstractCloudApplicationAdapter;
 
 public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
@@ -50,6 +51,10 @@ public class MongoDBUIBinding extends AbstractCloudAdapterUIBinding {
     protected Map<String, String> getConnectionProperties() {
         // only available in edit mode
         return (Map<String, String>) context.getContextObject("connectionProperties");
+    }
+    
+    protected LoggerService getLogger() {
+        return context.getServiceRegistry().getService(LoggerService.class);
     }
     
     protected void initUIBinding() {

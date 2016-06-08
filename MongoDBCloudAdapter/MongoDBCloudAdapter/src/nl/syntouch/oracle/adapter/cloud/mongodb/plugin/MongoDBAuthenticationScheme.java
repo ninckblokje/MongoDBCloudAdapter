@@ -16,7 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -28,11 +27,16 @@ import oracle.tip.tools.ide.adapters.cloud.api.connection.PropertyDefinition;
 import oracle.tip.tools.ide.adapters.cloud.api.connection.PropertyDefinitions;
 import oracle.tip.tools.ide.adapters.cloud.api.connection.PropertyType;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
+import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 
 public class MongoDBAuthenticationScheme extends AbstractAuthenticationScheme {
     
+    private final LoggerService logger;
+    
     public MongoDBAuthenticationScheme(AdapterPluginContext adapterPluginContext, CloudConnection cloudConnection) {
         super(adapterPluginContext, cloudConnection);
+        
+        logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
 
     @Override
