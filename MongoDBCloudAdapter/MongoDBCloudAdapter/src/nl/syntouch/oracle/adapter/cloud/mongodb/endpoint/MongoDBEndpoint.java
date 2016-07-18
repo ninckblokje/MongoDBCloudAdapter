@@ -16,6 +16,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.util.ArrayList;
+import java.util.List;
+
 import oracle.cloud.connector.api.CloudInvocationContext;
 import oracle.cloud.connector.api.CloudInvocationException;
 import oracle.cloud.connector.api.CloudMessage;
@@ -24,9 +27,9 @@ import oracle.cloud.connector.api.EndpointObserver;
 import oracle.cloud.connector.api.RemoteApplicationException;
 
 public class MongoDBEndpoint implements Endpoint {
-    public MongoDBEndpoint() {
-        super();
-    }
+    
+    private MongoDBConnection connection;
+    private List<EndpointObserver> observers = new ArrayList<>();
 
     @Override
     public CloudMessage invoke(CloudMessage cloudMessage) throws RemoteApplicationException, CloudInvocationException {
@@ -36,16 +39,21 @@ public class MongoDBEndpoint implements Endpoint {
 
     @Override
     public void addObserver(EndpointObserver endpointObserver) {
-        // TODO Implement this method
+        observers.add(endpointObserver);
     }
 
     @Override
     public void initialize(CloudInvocationContext cloudInvocationContext) throws CloudInvocationException {
-        // TODO Implement this method
+        connection = new MongoDBConnection(cloudInvocationContext);
+        connection
+            .setMongoUri(null)
+            .setMongoDb(null)
+            .setMongoCollection(null)
+            .connect();
     }
 
     @Override
     public void destroy() {
-        // TODO Implement this method
+        connection.close();
     }
 }

@@ -43,7 +43,7 @@ public class MongoDBAdapter extends AbstractCloudApplicationAdapter {
 
     @Override
     public CloudConnection getConnection() {
-        return new MongoDBConnection(ctx);
+        return new MongoDBPing(ctx);
     }
 
     @Override

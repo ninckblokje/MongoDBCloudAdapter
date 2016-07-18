@@ -16,14 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import com.mongodb.MongoClient;
-import com.mongodb.MongoClientURI;
 import com.mongodb.client.MongoCollection;
-import com.mongodb.client.MongoDatabase;
 
 import java.util.Set;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
+import nl.syntouch.oracle.adapter.cloud.mongodb.endpoint.MongoDBConnection;
 
 import oracle.tip.tools.ide.adapters.cloud.api.connection.AbstractCloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.connection.AuthenticationScheme;
@@ -34,19 +32,17 @@ import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 
 import org.bson.Document;
 
-public class MongoDBConnection extends AbstractCloudConnection implements AutoCloseable {
+public class MongoDBPing extends AbstractCloudConnection implements AutoCloseable {
     
     private final LoggerService logger;
     
     private AdapterPluginContext ctx;
+    private MongoDBConnection connection;
     
-    private MongoClient client = null;
-    private MongoDatabase db = null;
-    private MongoCollection<Document> collection = null;
-    
-    public MongoDBConnection(AdapterPluginContext adapterPluginContext) {
+    public MongoDBPing(AdapterPluginContext adapterPluginContext) {
         super(adapterPluginContext.getReferenceBindingName());
         ctx = adapterPluginContext;
+        connection = new MongoDBConnection(adapterPluginContext);
         
         logger = adapterPluginContext.getServiceRegistry().getService(LoggerService.class);
     }
@@ -56,31 +52,22 @@ public class MongoDBConnection extends AbstractCloudConnection implements AutoCl
         String mongoDb = getConnectionProperties().getProperty(Constants.MONGO_DB_KEY);
         String mongoCollection = getConnectionProperties().getProperty(Constants.MONGO_COLLECTION_KEY);
         
-        connect(mongoUri, mongoDb, mongoCollection);
-    }
-    
-    public void connect(String mongoUri, String mongoDb, String mongoCollection) {
-        close();
+        connection
+            .setMongoUri(mongoUri)
+            .setMongoDb(mongoDb)
+            .setMongoCollection(mongoCollection)
+            .connect();
         
-        logger.log(LoggerService.Level.INFO, "Connecting to [" + mongoUri + "]");
-        MongoClientURI uri = new MongoClientURI(mongoUri);
-        client = new MongoClient(uri);
-        
-        logger.log(LoggerService.Level.INFO, "Retrieving collection [" + mongoCollection + "] from database [" + mongoDb + "]");
-        db = client.getDatabase(mongoDb);
-        collection = db.getCollection(mongoCollection);
-        
-        ctx.setContextObject(Constants.MONGO_NAMESPACE_KEY, collection.getNamespace().getFullName());
+        ctx.setContextObject(Constants.MONGO_NAMESPACE_KEY, connection.getNamespace());
     }
     
     public MongoCollection<Document> getCollection() {
-        return collection;
+        return connection.getCollection();
     }
     
     @Override
     public void close() {
-        logger.log(LoggerService.Level.DEBUG, "Closing connection");
-        if (client != null) client.close();
+        connection.close();
     }
 
     @Override

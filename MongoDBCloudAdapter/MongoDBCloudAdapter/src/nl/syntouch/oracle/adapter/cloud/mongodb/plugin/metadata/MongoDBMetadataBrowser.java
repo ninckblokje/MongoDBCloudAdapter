@@ -39,7 +39,7 @@ import javax.activation.DataSource;
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
-import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBConnection;
+import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.MongoDBPing;
 
 import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.metadata.MetadataParser;
@@ -68,11 +68,11 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
     
     protected Document getSampleDocument(AdapterPluginContext adapterPluginContext) {
         CloudConnection cloudConnection = (CloudConnection) adapterPluginContext.getContextObject("adapterConnection");
-        if (!(cloudConnection instanceof MongoDBConnection)) {
+        if (!(cloudConnection instanceof MongoDBPing)) {
             throw new RuntimeException("CloudConnection must be an instance of MongoDBConnection");
         }
         
-        MongoDBConnection connection = (MongoDBConnection) cloudConnection;
+        MongoDBPing connection = (MongoDBPing) cloudConnection;
         try {
             connection.connect();
             Document sample = connection.getCollection().find().first();
