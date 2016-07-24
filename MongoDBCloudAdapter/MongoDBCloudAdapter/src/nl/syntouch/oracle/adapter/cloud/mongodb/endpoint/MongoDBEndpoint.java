@@ -19,6 +19,9 @@ limitations under the License.
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
+
+import oracle.cloud.connector.api.CloudAdapterLoggingService;
 import oracle.cloud.connector.api.CloudInvocationContext;
 import oracle.cloud.connector.api.CloudInvocationException;
 import oracle.cloud.connector.api.CloudMessage;
@@ -26,13 +29,21 @@ import oracle.cloud.connector.api.Endpoint;
 import oracle.cloud.connector.api.EndpointObserver;
 import oracle.cloud.connector.api.RemoteApplicationException;
 
+import org.bson.Document;
+
 public class MongoDBEndpoint implements Endpoint {
     
+    private CloudAdapterLoggingService logger;
+    
     private MongoDBConnection connection;
+    private CloudInvocationContext ctx;
     private List<EndpointObserver> observers = new ArrayList<>();
 
     @Override
     public CloudMessage invoke(CloudMessage cloudMessage) throws RemoteApplicationException, CloudInvocationException {
+        String operationName = (String) ctx.getContextObject("targetOperation");
+        Document bson = (Document) cloudMessage.getMessagePayload();
+        
         // TODO Implement this method
         return null;
     }
@@ -44,16 +55,25 @@ public class MongoDBEndpoint implements Endpoint {
 
     @Override
     public void initialize(CloudInvocationContext cloudInvocationContext) throws CloudInvocationException {
+        logger = cloudInvocationContext.getLoggingService();
+        
+        String mongoUri = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
+        String mongoDb = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
+        String mongoCollection = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
+        
+        logger.log(CloudAdapterLoggingService.Level.DEBUG, "Initializing endpoint for MongoDB");
+        
         connection = new MongoDBConnection(cloudInvocationContext);
         connection
-            .setMongoUri(null)
-            .setMongoDb(null)
-            .setMongoCollection(null)
+            .setMongoUri(mongoUri)
+            .setMongoDb(mongoDb)
+            .setMongoCollection(mongoCollection)
             .connect();
     }
 
     @Override
     public void destroy() {
+        logger.log(CloudAdapterLoggingService.Level.DEBUG, "Destroying endpoint for MongoDB");
         connection.close();
     }
 }

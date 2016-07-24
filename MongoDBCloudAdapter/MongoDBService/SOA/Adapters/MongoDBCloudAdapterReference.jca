@@ -1,0 +1,18 @@
+<adapter-config xsdTargetNamespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types" name="MongoDBCloudAdapterReferencePortType" adapter="MongoDBCloudAdapter" wsdlLocation="MongoDBCloudAdapterReference.wsdl" xmlns="http://platform.integration.oracle/blocks/adapter/fw/metadata">
+  <connection-factory location="cloud/CloudAdapter">
+    <non-managed-connection managedConnectionFactoryClassName="">
+      <property name="MongoDB.sampleBsonFile" value="b2b7ebe1-d642-46aa-aa68-59808aa8b187.json"/>
+      <property name="MongoDB.db" value="test"/>
+      <property name="csfkey" value="local"/>
+      <property name="csfMap" value="oracle.wsm.security"/>
+      <property name="MongoDB.collection" value="test"/>
+      <property name="applicationVersion" value="1"/>
+      <property name="MongoDB.mode" value="structured"/>
+    </non-managed-connection>
+  </connection-factory>
+  <endpoint-interaction portType="MongoDBCloudAdapterReferencePortType" operation="insert">
+    <interaction-spec className="oracle.tip.adapter.cloud.CloudInteractionSpec">
+      <property name="targetOperation" value="insert"/>
+    </interaction-spec>
+  </endpoint-interaction>
+</adapter-config>

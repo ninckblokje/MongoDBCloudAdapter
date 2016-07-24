@@ -70,7 +70,10 @@
       <list n="technologyScope">
          <string v="Maven"/>
          <string v="SOA"/>
+         <string v="WSDL"/>
+         <string v="WSPolicy"/>
          <string v="XML"/>
+         <string v="XML_SCHEMA"/>
       </list>
    </hash>
    <hash n="oracle.jdeveloper.compiler.OjcConfiguration">
@@ -278,4 +281,5 @@
          </list>
       </hash>
    </hash>
+   <value n="SCA_BPEL_FOLDER_PROPERTY_NAME" v="BPEL/"/>
 </jpr:project>

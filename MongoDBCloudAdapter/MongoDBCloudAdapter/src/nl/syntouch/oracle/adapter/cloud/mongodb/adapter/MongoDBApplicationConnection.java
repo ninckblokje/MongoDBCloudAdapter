@@ -16,7 +16,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import java.util.Collections;
+import java.util.ArrayList;
 import java.util.List;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
@@ -24,11 +24,12 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 import nl.syntouch.oracle.adapter.cloud.mongodb.endpoint.MongoDBEndpointFactory;
 
 import oracle.cloud.connector.api.CloudMessageHandler;
-import oracle.cloud.connector.api.EndpointFactory;
 import oracle.cloud.connector.api.SessionManager;
 import oracle.cloud.connector.impl.AbstractCloudApplicationConnection;
 
 public class MongoDBApplicationConnection extends AbstractCloudApplicationConnection {
+    
+    private boolean closed = false;
     
     public MongoDBApplicationConnection() {
         super();
@@ -38,8 +39,11 @@ public class MongoDBApplicationConnection extends AbstractCloudApplicationConnec
 
     @Override
     protected List<CloudMessageHandler> getMessageHandlers() {
-        // TODO Implement this method
-        return Collections.emptyList();
+        List<CloudMessageHandler> handlers = new ArrayList<>();
+        
+        handlers.add(new MongoDBMessageHandler());
+        
+        return handlers;
     }
 
     @Override
@@ -49,18 +53,16 @@ public class MongoDBApplicationConnection extends AbstractCloudApplicationConnec
 
     @Override
     public void close() {
-        // TODO Implement this method
+        closed = true;
     }
 
     @Override
     public boolean isValid() {
-        // TODO Implement this method
-        return false;
+        return !closed;
     }
 
     @Override
     public SessionManager getSessionManager() {
-        // TODO Implement this method
         return null;
     }
 }

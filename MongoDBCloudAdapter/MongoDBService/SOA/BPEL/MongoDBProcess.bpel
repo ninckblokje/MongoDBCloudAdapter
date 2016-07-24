@@ -1,0 +1,88 @@
+<?xml version = "1.0" encoding = "UTF-8" ?>
+<!--
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  Oracle JDeveloper BPEL Designer 
+  
+  Created: Sun Jul 24 13:48:09 CEST 2016
+  Author:  ninckblokje
+  Type: BPEL 2.0 Process
+  Purpose: Synchronous BPEL Process
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+<process name="MongoDBProcess"
+               targetNamespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess"
+               xmlns="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+               xmlns:client="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess"
+               xmlns:ora="http://schemas.oracle.com/xpath/extension"
+               xmlns:ui="http://xmlns.oracle.com/soa/designer"
+               xmlns:bpelx="http://schemas.oracle.com/bpel/extension"
+         xmlns:bpel="http://docs.oasis-open.org/wsbpel/2.0/process/executable"
+         xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference"
+         xmlns:ns3="MongoDBCloudAdapter/test.test/insert/response"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xmlns:ns2="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
+         xmlns:ns4="MongoDBCloudAdapter/test.test/insert/request">
+
+    <import ui:processWSDL="true" namespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess" location="../WSDLs/MongoDBProcess.wsdl" importType="http://schemas.xmlsoap.org/wsdl/"/>
+    <!-- 
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        PARTNERLINKS                                                      
+        List of services participating in this BPEL process               
+      ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    --> 
+  <partnerLinks>
+    <!-- 
+      The 'client' role represents the requester of this service. It is 
+      used for callback. The location and correlation information associated
+      with the client role are automatically set using WS-Addressing.
+    -->
+    <partnerLink name="mongodbprocess_client" partnerLinkType="client:MongoDBProcess" myRole="MongoDBProcessProvider"/>
+    <partnerLink name="MongoDBCloudAdapterReference" partnerLinkType="ns1:insert_plt" partnerRole="insert_role"/>
+  </partnerLinks>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+      VARIABLES                                                        
+      List of messages and XML documents used within this BPEL process 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <variables>
+    <!-- Reference to the message passed as input during initiation -->
+    <variable name="inputVariable" messageType="client:MongoDBProcessRequestMessage"/>
+
+    <!-- Reference to the message that will be returned to the requester-->
+    <variable name="outputVariable" messageType="client:MongoDBProcessResponseMessage"/>
+    <variable name="InvokeInsert_insert_InputVariable" messageType="ns1:insertRequestMessage"/>
+    <variable name="InvokeInsert_insert_OutputVariable" messageType="ns1:insertResponseMessage"/>
+  </variables>
+
+  <!-- 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+     ORCHESTRATION LOGIC                                               
+     Set of activities coordinating the flow of messages across the    
+     services integrated within this business process                  
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+  -->
+  <sequence name="main">
+
+    <!-- Receive input from requestor. (Note: This maps to operation defined in MongoDBProcess.wsdl) -->
+    <receive name="receiveInput" partnerLink="mongodbprocess_client" portType="client:MongoDBProcess" operation="process" variable="inputVariable" createInstance="yes"/>
+    <assign name="Assign2">
+      <copy>
+        <from>$inputVariable.payload/client:input</from>
+        <to>$InvokeInsert_insert_InputVariable.parameters/ns2:Document/ns4:field1</to>
+      </copy>
+    </assign>
+    <invoke name="InvokeInsert" bpelx:invokeAsDetail="no" partnerLink="MongoDBCloudAdapterReference"
+            portType="ns1:MongoDBCloudAdapterReferencePortType" operation="insert"
+            inputVariable="InvokeInsert_insert_InputVariable" outputVariable="InvokeInsert_insert_OutputVariable"/>
+    <assign name="Assign1">
+      <copy>
+        <from>$InvokeInsert_insert_OutputVariable.parameters/ns2:Document/ns3:_id</from>
+        <to>$outputVariable.payload/client:result</to>
+      </copy>
+    </assign>
+    <!-- Generate reply to synchronous request -->
+    <reply name="replyOutput" partnerLink="mongodbprocess_client" portType="client:MongoDBProcess" operation="process" variable="outputVariable"/>
+  </sequence>
+</process>

@@ -1,0 +1,67 @@
+<wsdl:definitions
+    
+     targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference"
+     xmlns:ns0="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
+     xmlns:ns1="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference"
+     xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/"
+    >
+    <plnk:partnerLinkType xmlns:plnk="http://schemas.xmlsoap.org/ws/2003/05/partner-link/" name="insert_plt">
+        <plnk:role name="insert_role">
+            <plnk:portType name="ns1:MongoDBCloudAdapterReferencePortType"/>
+        </plnk:role>
+    </plnk:partnerLinkType>
+    <wsdl:types>
+        <xs:schema xmlns="MongoDBCloudAdapter/test.test/insert/request" elementFormDefault="qualified"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="MongoDBCloudAdapter/test.test/insert/request">
+            <xs:complexType name="Document">
+                <xs:sequence>
+                    <xs:element name="_id" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="field1" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="_unstructured" type="xs:anyType" nillable="true" minOccurs="0"
+                         maxOccurs="1"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns="MongoDBCloudAdapter/test.test/insert/response" elementFormDefault="qualified"
+             xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="MongoDBCloudAdapter/test.test/insert/response">
+            <xs:complexType name="Document">
+                <xs:sequence>
+                    <xs:element name="_id" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="_unstructured" type="xs:anyType" nillable="true" minOccurs="0"
+                         maxOccurs="1"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+        <xs:schema xmlns="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
+             elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
+             xmlns:ns2="MongoDBCloudAdapter/test.test/insert/request" xmlns:ns3="MongoDBCloudAdapter/test.test/insert/response">
+            <xs:import namespace="MongoDBCloudAdapter/test.test/insert/response"/>
+            <xs:import namespace="MongoDBCloudAdapter/test.test/insert/request"/>
+            <xs:element name="insert" type="insertType"/>
+            <xs:complexType name="insertType">
+                <xs:sequence>
+                    <xs:element maxOccurs="1" minOccurs="1" type="ns2:Document" name="Document"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:element name="insertResponse" type="insertResponseType"/>
+            <xs:complexType name="insertResponseType">
+                <xs:sequence>
+                    <xs:element maxOccurs="1" minOccurs="1" type="ns3:Document" name="Document"/>
+                </xs:sequence>
+            </xs:complexType>
+        </xs:schema>
+    </wsdl:types>
+    <wsdl:message name="insertRequestMessage">
+        <wsdl:part name="parameters" element="ns0:insert"/>
+    </wsdl:message>
+    <wsdl:message name="insertResponseMessage">
+        <wsdl:part name="parameters" element="ns0:insertResponse"/>
+    </wsdl:message>
+    <wsdl:portType name="MongoDBCloudAdapterReferencePortType">
+        <wsdl:operation name="insert">
+            <cloud:CloudOperation xmlns:cloud="http://xml.oracle.com/types" targetOperation="insert"/>
+            <wsdl:input message="ns1:insertRequestMessage"/>
+            <wsdl:output message="ns1:insertResponseMessage"/>
+        </wsdl:operation>
+    </wsdl:portType>
+</wsdl:definitions>

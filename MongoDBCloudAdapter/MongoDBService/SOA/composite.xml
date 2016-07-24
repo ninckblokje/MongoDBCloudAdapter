@@ -11,6 +11,38 @@
            xmlns:orawsp="http://schemas.oracle.com/ws/2006/01/policy"
            xmlns:ui="http://xmlns.oracle.com/soa/designer/"
            xmlns:sca-ext="http://xmlns.oracle.com/sca/1.0-ext">
+  <import namespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference"
+          location="WSDLs/MongoDBCloudAdapterReference.wsdl" importType="wsdl"/>
+  <import namespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess"
+          location="WSDLs/MongoDBProcess.wsdl" importType="wsdl"/>
+  <service name="mongodbprocess_client_ep" ui:wsdlLocation="WSDLs/MongoDBProcess.wsdl">
+    <interface.wsdl interface="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess#wsdl.interface(MongoDBProcess)"/>
+    <binding.ws port="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess#wsdl.endpoint(mongodbprocess_client_ep/MongoDBProcess_pt)"/>
+  </service>
   <property name="productVersion" type="xs:string" many="false">12.1.3.0.0</property>
   <property name="compositeID" type="xs:string" many="false">eb38a416-c92f-4a89-9e0a-e0e35f259f45</property>
+  <component name="MongoDBProcess" version="2.0">
+    <implementation.bpel src="BPEL/MongoDBProcess.bpel"/>
+    <componentType>
+      <service name="mongodbprocess_client" ui:wsdlLocation="WSDLs/MongoDBProcess.wsdl">
+        <interface.wsdl interface="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess#wsdl.interface(MongoDBProcess)"/>
+      </service>
+      <reference name="MongoDBCloudAdapterReference" ui:wsdlLocation="WSDLs/MongoDBCloudAdapterReference.wsdl">
+        <interface.wsdl interface="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference#wsdl.interface(MongoDBCloudAdapterReferencePortType)"/>
+      </reference>
+    </componentType>
+    <property name="bpel.config.transaction" type="xs:string" many="false">required</property>
+  </component>
+  <reference name="MongoDBCloudAdapterReference" ui:wsdlLocation="WSDLs/MongoDBCloudAdapterReference.wsdl">
+    <interface.wsdl interface="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference#wsdl.interface(MongoDBCloudAdapterReferencePortType)"/>
+    <binding.jca config="Adapters/MongoDBCloudAdapterReference.jca"/>
+  </reference>
+  <wire>
+    <source.uri>mongodbprocess_client_ep</source.uri>
+    <target.uri>MongoDBProcess/mongodbprocess_client</target.uri>
+  </wire>
+  <wire>
+    <source.uri>MongoDBProcess/MongoDBCloudAdapterReference</source.uri>
+    <target.uri>MongoDBCloudAdapterReference</target.uri>
+  </wire>
 </composite>

@@ -81,8 +81,6 @@ public class MongoDBConnection implements AutoCloseable {
     }
 
     public void connect() {
-        close();
-
         logger.log(CloudAdapterLogger.Level.INFO, "Connecting to [" + mongoUri + "]");
         MongoClientURI uri = new MongoClientURI(mongoUri);
         client = new MongoClient(uri);
@@ -102,9 +100,5 @@ public class MongoDBConnection implements AutoCloseable {
         collection = null;
         db = null;
         client = null;
-        
-        mongoCollection = null;
-        mongoDb = null;
-        mongoUri = null;
     }
 }
