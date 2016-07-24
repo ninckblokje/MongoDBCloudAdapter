@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<con:soapui-project id="9dfa5f27-467e-41b3-97c8-38a86e4b2166" activeEnvironment="Default" name="MongoDBService" resourceRoot="" soapui-version="5.2.1" xmlns:con="http://eviware.com/soapui/config"><con:settings/><con:interface xsi:type="con:WsdlInterface" id="35b99f7a-7494-44ae-8bf6-85b0c99ff8fa" wsaVersion="NONE" name="MongoDBProcessBinding" type="wsdl" bindingName="{http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess}MongoDBProcessBinding" soapVersion="1_1" anonymous="optional" definition="http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep?WSDL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"><con:settings/><con:definitionCache type="TEXT" rootPart="http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep?WSDL"><con:part><con:url>http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep?WSDL</con:url><con:content><![CDATA[<wsdl:definitions name="MongoDBProcess" targetNamespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess" xmlns:wsdl="http://schemas.xmlsoap.org/wsdl/" xmlns:client="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess" xmlns:plnk="http://docs.oasis-open.org/wsbpel/2.0/plnktype" xmlns:soap="http://schemas.xmlsoap.org/wsdl/soap/">
+  <wsdl:documentation>
+    <abstractWSDL>http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService!1.0/WSDLs/MongoDBProcess.wsdl</abstractWSDL>
+  </wsdl:documentation>
+  <plnk:partnerLinkType name="MongoDBProcess">
+    <plnk:role name="MongoDBProcessProvider" portType="client:MongoDBProcess"/>
+  </plnk:partnerLinkType>
+  <wsdl:types>
+    <schema xmlns="http://www.w3.org/2001/XMLSchema">
+      <import namespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess" schemaLocation="http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep?XSD=../Schemas/MongoDBProcess.xsd"/>
+    </schema>
+  </wsdl:types>
+  <wsdl:message name="MongoDBProcessRequestMessage">
+    <wsdl:part name="payload" element="client:process"/>
+  </wsdl:message>
+  <wsdl:message name="MongoDBProcessResponseMessage">
+    <wsdl:part name="payload" element="client:processResponse"/>
+  </wsdl:message>
+  <wsdl:portType name="MongoDBProcess">
+    <wsdl:operation name="process">
+      <wsdl:input message="client:MongoDBProcessRequestMessage"/>
+      <wsdl:output message="client:MongoDBProcessResponseMessage"/>
+    </wsdl:operation>
+  </wsdl:portType>
+  <wsdl:binding name="MongoDBProcessBinding" type="client:MongoDBProcess">
+    <soap:binding transport="http://schemas.xmlsoap.org/soap/http"/>
+    <wsdl:operation name="process">
+      <soap:operation style="document" soapAction="process"/>
+      <wsdl:input>
+        <soap:body use="literal"/>
+      </wsdl:input>
+      <wsdl:output>
+        <soap:body use="literal"/>
+      </wsdl:output>
+    </wsdl:operation>
+  </wsdl:binding>
+  <wsdl:service name="mongodbprocess_client_ep">
+    <wsdl:port name="MongoDBProcess_pt" binding="client:MongoDBProcessBinding">
+      <soap:address location="http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep"/>
+    </wsdl:port>
+  </wsdl:service>
+</wsdl:definitions>]]></con:content><con:type>http://schemas.xmlsoap.org/wsdl/</con:type></con:part><con:part><con:url>http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep?XSD=../Schemas/MongoDBProcess.xsd</con:url><con:content><![CDATA[<schema attributeFormDefault="unqualified" elementFormDefault="qualified" targetNamespace="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess" xmlns="http://www.w3.org/2001/XMLSchema">
+  <element name="process">
+    <complexType>
+      <sequence>
+        <element name="input" type="string"/>
+      </sequence>
+    </complexType>
+  </element>
+  <element name="processResponse">
+    <complexType>
+      <sequence>
+        <element name="result" type="string"/>
+      </sequence>
+    </complexType>
+  </element>
+</schema>]]></con:content><con:type>http://www.w3.org/2001/XMLSchema</con:type></con:part></con:definitionCache><con:endpoints><con:endpoint>http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep</con:endpoint></con:endpoints><con:operation id="196e65f6-bdbb-4853-9a57-2dc9dd3f32e5" isOneWay="false" action="process" name="process" bindingOperationName="process" type="Request-Response" inputName="" receivesAttachments="false" sendsAttachments="false" anonymous="optional"><con:settings/><con:call id="a3ed667c-019e-44e1-9b75-59652f933476" name="Request 1"><con:settings><con:setting id="com.eviware.soapui.impl.wsdl.WsdlRequest@request-headers">&lt;xml-fragment/></con:setting></con:settings><con:encoding>UTF-8</con:encoding><con:endpoint>http://desktop-t7vhrk1:7101/soa-infra/services/default/MongoDBService/mongodbprocess_client_ep</con:endpoint><con:request><![CDATA[<soapenv:Envelope xmlns:soapenv="http://schemas.xmlsoap.org/soap/envelope/" xmlns:mon="http://xmlns.oracle.com/MongoDBCloudAdapter/MongoDBService/MongoDBProcess">\r
+   <soapenv:Header/>\r
+   <soapenv:Body>\r
+      <mon:process>\r
+         <mon:input>?</mon:input>\r
+      </mon:process>\r
+   </soapenv:Body>\r
+</soapenv:Envelope>]]></con:request><con:credentials><con:authType>No Authorization</con:authType></con:credentials><con:jmsConfig JMSDeliveryMode="PERSISTENT"/><con:jmsPropertyConfig/><con:wsaConfig mustUnderstand="NONE" version="200508" action="process"/><con:wsrmConfig version="1.2"/></con:call></con:operation></con:interface><con:properties/><con:wssContainer/><con:oAuth2ProfileContainer/></con:soapui-project>

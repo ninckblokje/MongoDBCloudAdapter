@@ -1,5 +1,6 @@
 .data
 classes
+deploy
 SCA-INF
 *.lck
 CloudAdapter-DeveloperGuide.pdf

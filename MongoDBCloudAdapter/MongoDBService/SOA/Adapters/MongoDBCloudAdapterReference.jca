@@ -1,6 +1,6 @@
 <adapter-config xsdTargetNamespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types" name="MongoDBCloudAdapterReferencePortType" adapter="MongoDBCloudAdapter" wsdlLocation="MongoDBCloudAdapterReference.wsdl" xmlns="http://platform.integration.oracle/blocks/adapter/fw/metadata">
   <connection-factory location="cloud/CloudAdapter">
-    <non-managed-connection managedConnectionFactoryClassName="">
+    <non-managed-connection managedConnectionFactoryClassName="nl.syntouch.oracle.adapter.cloud.mongodb.adapter.MongoDBApplicationConnectionFactory">
       <property name="MongoDB.sampleBsonFile" value="b2b7ebe1-d642-46aa-aa68-59808aa8b187.json"/>
       <property name="MongoDB.db" value="test"/>
       <property name="csfkey" value="local"/>

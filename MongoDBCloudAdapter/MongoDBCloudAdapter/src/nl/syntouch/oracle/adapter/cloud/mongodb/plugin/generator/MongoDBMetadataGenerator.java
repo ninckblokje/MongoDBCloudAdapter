@@ -20,6 +20,7 @@ import java.util.List;
 
 import java.util.UUID;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.adapter.MongoDBApplicationConnectionFactory;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONArtifactGenerator;
@@ -27,6 +28,7 @@ import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONArtifactGenerato
 import oracle.tip.tools.ide.adapters.cloud.api.connection.CloudConnection;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.ArtifactGenerator;
 import oracle.tip.tools.ide.adapters.cloud.api.generation.RuntimeGenerationContext;
+import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterConstants;
 import oracle.tip.tools.ide.adapters.cloud.api.plugin.AdapterPluginContext;
 import oracle.tip.tools.ide.adapters.cloud.api.service.LoggerService;
 import oracle.tip.tools.ide.adapters.cloud.impl.generation.AbstractRuntimeMetadataGenerator;
@@ -56,6 +58,8 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
 
     @Override
     protected void initializeContext(RuntimeGenerationContext runtimeGenerationContext) {
+        runtimeGenerationContext.setContextObject(AdapterConstants.RUNTIME_CONNECTION_FACTORY, MongoDBApplicationConnectionFactory.class.getName());
+        
         CloudConnection connection = getCloudConnection();
         
         connection.getConnectionProperties().setProperty(Constants.CONTEXT_MODE_KEY, (String) ctx.getContextObject(Constants.CONTEXT_MODE_KEY));
