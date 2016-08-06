@@ -19,6 +19,7 @@ limitations under the License.
 import java.util.ArrayList;
 import java.util.List;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.adapter.MongoDBCredentialStore;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
 import oracle.cloud.connector.api.CloudAdapterLoggingService;
@@ -38,6 +39,10 @@ public class MongoDBEndpoint implements Endpoint {
     private MongoDBConnection connection;
     private CloudInvocationContext ctx;
     private List<EndpointObserver> observers = new ArrayList<>();
+    
+    protected void initializeConnectionProperties(CloudInvocationContext cloudInvocationContext) {
+        cloudInvocationContext.getCloudConnectionProperties().put(Constants.MONGO_URI_KEY, new MongoDBCredentialStore(cloudInvocationContext).getUrl());
+    }
 
     @Override
     public CloudMessage invoke(CloudMessage cloudMessage) throws RemoteApplicationException, CloudInvocationException {
@@ -56,6 +61,7 @@ public class MongoDBEndpoint implements Endpoint {
     @Override
     public void initialize(CloudInvocationContext cloudInvocationContext) throws CloudInvocationException {
         logger = cloudInvocationContext.getLoggingService();
+        initializeConnectionProperties(cloudInvocationContext);
         
         String mongoUri = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
         String mongoDb = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
