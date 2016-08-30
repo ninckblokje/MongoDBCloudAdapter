@@ -1,10 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Document>
-    <_id>*</_id>
-    <rootElement>
-        <elementOne>value1</elementOne>
-        <elementTwo>
-            <elementThree>value2</elementThree>
-        </elementTwo>
-    </rootElement>
-</Document>
+<insertResponse xmlns="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types">
+    <Document>
+        <_id xmlns="MongoDBCloudAdapter/test.test/insert/response">*</_id>
+        <rootElement xmlns="MongoDBCloudAdapter/test.test/insert/response">
+            <elementOne>value1</elementOne>
+            <elementTwo>
+                <elementThree>value2</elementThree>
+            </elementTwo>
+        </rootElement>
+    </Document>
+</insertResponse>

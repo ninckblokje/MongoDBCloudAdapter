@@ -66,8 +66,6 @@ public class TestBsonToXmlTransformer {
         
         return builder.parse(this.getClass().getResourceAsStream(resourcePath + "/" + fileName));
     }
-    
-
 
     protected String toString(Node xml) throws TransformerConfigurationException, TransformerException {
         StringWriter sw = new StringWriter();
@@ -92,7 +90,9 @@ public class TestBsonToXmlTransformer {
                             .append("elementThree", "value2")));
         
         Node xml = new BsonToXmlTransformer()
-            .setNamespace("")
+            .setRootNamespace("http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types")
+            .setDataNamespace("MongoDBCloudAdapter/test.test/insert/response")
+            .setWrapperElementName("insertResponse")
             .transform(bson);
         Assert.assertNotNull(xml);
         

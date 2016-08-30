@@ -16,6 +16,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import java.lang.reflect.Field;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,9 +32,12 @@ import oracle.cloud.connector.api.CloudInvocationContext;
 import oracle.cloud.connector.api.CloudInvocationException;
 import oracle.cloud.connector.api.CloudMessage;
 import oracle.cloud.connector.api.CloudMessageFactory;
+import oracle.cloud.connector.api.CloudRuntimeConstants;
 import oracle.cloud.connector.api.Endpoint;
 import oracle.cloud.connector.api.EndpointObserver;
 import oracle.cloud.connector.api.RemoteApplicationException;
+
+import oracle.xml.parser.schema.XMLSchema;
 
 import org.bson.Document;
 
@@ -43,11 +48,34 @@ public class MongoDBEndpoint implements Endpoint {
     private CloudAdapterLoggingService logger;
     
     private MongoDBConnection connection;
-    private CloudInvocationContext ctx;
     private List<EndpointObserver> observers = new ArrayList<>();
+    private String operationName;
+    private String rootNamespace;
+    private String typeNamespace;
     
-    protected void initializeConnectionProperties(CloudInvocationContext cloudInvocationContext) {
-        cloudInvocationContext.getCloudConnectionProperties().put(Constants.MONGO_URI_KEY, new MongoDBCredentialStore(cloudInvocationContext).getUrl());
+    protected void connect(CloudInvocationContext cloudInvocationContext) {
+        String mongoUri = new MongoDBCredentialStore(cloudInvocationContext).getUrl();
+        String mongoDb = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
+        String mongoCollection = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
+        
+        connection = new MongoDBConnection(cloudInvocationContext);
+        connection
+            .setMongoUri(mongoUri)
+            .setMongoDb(mongoDb)
+            .setMongoCollection(mongoCollection)
+            .connect();
+    }
+    
+    protected void initializeNamespaces(CloudInvocationContext cloudInvocationContext) {
+        XMLSchema inputSchema = (XMLSchema) cloudInvocationContext.getContextObject(CloudRuntimeConstants.TARGET_INPUT_SCHEMA);
+        rootNamespace = inputSchema.getSchemaTargetNS();
+        
+        String adapterName = rootNamespace.split("/")[5];
+        
+        String mongoNamespace = connection.getNamespace();
+        typeNamespace = adapterName + "/" + mongoNamespace + "/" + operationName;
+        
+        logger.log(CloudAdapterLoggingService.Level.DEBUG, "Set root namespace to [" + rootNamespace + "] and type namespace to [" + typeNamespace + "]");
     }
     
     protected CloudMessage invokeInsert(Document requestBson) throws CloudInvocationException {
@@ -56,13 +84,16 @@ public class MongoDBEndpoint implements Endpoint {
         Document responseBson = new Document()
                 .append("_id", requestBson.getObjectId("_id"));
         
-        Node responseXml = new BsonToXmlTransformer().setNamespace(null).transform(responseBson);
+        Node responseXml = new BsonToXmlTransformer()
+            .setRootNamespace(rootNamespace)
+            .setDataNamespace(typeNamespace + "/response")
+            .setWrapperElementName("insertResponse")
+            .transform(responseBson);
         return CloudMessageFactory.newInstance().createCloudMessage(responseXml);
     }
 
     @Override
     public CloudMessage invoke(CloudMessage requestMsg) throws RemoteApplicationException, CloudInvocationException {
-        String operationName = ctx.getTargetOperationName();
         Node xml = requestMsg.getMessagePayloadAsDocument();
         Document bson = new XmlToBsonTransformer().transform(xml);
         
@@ -72,6 +103,7 @@ public class MongoDBEndpoint implements Endpoint {
                 responseMsg = invokeInsert(bson);
                 break;
             default:
+                logger.log(CloudAdapterLoggingService.Level.ERROR, "Unknown operation [" + operationName + "]");
                 throw new CloudInvocationException("Unknown operation [" + operationName + "]");
         }
         
@@ -85,28 +117,13 @@ public class MongoDBEndpoint implements Endpoint {
 
     @Override
     public void initialize(CloudInvocationContext cloudInvocationContext) throws CloudInvocationException {
-        ctx = cloudInvocationContext;
-        
-        logger = ctx.getLoggingService();
-        initializeConnectionProperties(ctx);
-        
-        String mongoUri = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
-        String mongoDb = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
-        String mongoCollection = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
-        
-        System.err.println("ctx conn");
-        System.err.println(ctx.getCloudConnectionProperties());
-        System.err.println("ctx opp");
-        System.err.println(ctx.getCloudOperationProperties());
+        logger = cloudInvocationContext.getLoggingService();
         
         logger.log(CloudAdapterLoggingService.Level.DEBUG, "Initializing endpoint for MongoDB");
+        connect(cloudInvocationContext);
         
-        connection = new MongoDBConnection(ctx);
-        connection
-            .setMongoUri(mongoUri)
-            .setMongoDb(mongoDb)
-            .setMongoCollection(mongoCollection)
-            .connect();
+        operationName = cloudInvocationContext.getTargetOperationName();
+        initializeNamespaces(cloudInvocationContext);
     }
 
     @Override

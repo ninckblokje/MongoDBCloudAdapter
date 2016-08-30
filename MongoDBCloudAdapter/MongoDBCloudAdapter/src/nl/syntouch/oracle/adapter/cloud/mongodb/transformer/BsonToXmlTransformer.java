@@ -32,7 +32,9 @@ import org.w3c.dom.Node;
 
 public class BsonToXmlTransformer implements Transformer<Document,Node> {
     
-    private String namespace;
+    private String dataNamespace;
+    private String rootNamespace;
+    private String wrapperElementName;
     
     protected void transform(org.w3c.dom.Document xml, Node parentXml, Document bson, String namespace) {
         Set<String> keys = bson.keySet();
@@ -58,10 +60,16 @@ public class BsonToXmlTransformer implements Transformer<Document,Node> {
             DocumentBuilder documentBuilder = documentBuilderFactory.newDocumentBuilder();
             org.w3c.dom.Document xml = documentBuilder.newDocument();
             
-            Element elem = xml.createElementNS(namespace, "Document");
-            xml.appendChild(elem);
+            Element elem = xml.createElementNS(rootNamespace, "Document");
+            if (wrapperElementName != null) {
+                Element wrapperElem = xml.createElementNS(rootNamespace, wrapperElementName);
+                wrapperElem.appendChild(elem);
+                xml.appendChild(wrapperElem);
+            } else {            
+                xml.appendChild(elem);
+            }
             
-            transform(xml, elem, t, namespace);
+            transform(xml, elem, t, dataNamespace);
             
             return xml;
         } catch (ParserConfigurationException ex) {
@@ -69,12 +77,31 @@ public class BsonToXmlTransformer implements Transformer<Document,Node> {
         }
     }
 
-    public BsonToXmlTransformer setNamespace(String namespace) {
-        this.namespace = namespace;
+
+    public BsonToXmlTransformer setDataNamespace(String dataNamespace) {
+        this.dataNamespace = dataNamespace;
         return this;
     }
 
-    public String getNamespace() {
-        return namespace;
+    public String getDataNamespace() {
+        return dataNamespace;
+    }
+
+    public BsonToXmlTransformer setRootNamespace(String rootNamespace) {
+        this.rootNamespace = rootNamespace;
+        return this;
+    }
+
+    public String getRootNamespace() {
+        return rootNamespace;
+    }
+
+    public BsonToXmlTransformer setWrapperElementName(String wrapperElementName) {
+        this.wrapperElementName = wrapperElementName;
+        return this;
+    }
+
+    public String getWrapperElementName() {
+        return wrapperElementName;
     }
 }
