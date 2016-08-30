@@ -24,6 +24,7 @@
    </list>
    <list n="listOfChildren">
       <hash><url n="URL" path="MongoDBCloudAdapter/MongoDBCloudAdapter.jpr"/></hash>
+      <hash><url n="URL" path="MongoDBCloudAdapter/MongoDBCloudAdapter-test.jpr"/></hash>
       <hash><url n="URL" path="MongoDBSampleCode/MongoDBSampleCode.jpr"/></hash>
       <hash><url n="URL" path="MongoDBService/MongoDBService.jpr"/></hash>
    </list>

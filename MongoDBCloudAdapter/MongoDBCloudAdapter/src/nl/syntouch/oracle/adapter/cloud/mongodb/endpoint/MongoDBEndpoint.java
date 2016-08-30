@@ -22,15 +22,21 @@ import java.util.List;
 import nl.syntouch.oracle.adapter.cloud.mongodb.adapter.MongoDBCredentialStore;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.transformer.BsonToXmlTransformer;
+import nl.syntouch.oracle.adapter.cloud.mongodb.transformer.XmlToBsonTransformer;
+
 import oracle.cloud.connector.api.CloudAdapterLoggingService;
 import oracle.cloud.connector.api.CloudInvocationContext;
 import oracle.cloud.connector.api.CloudInvocationException;
 import oracle.cloud.connector.api.CloudMessage;
+import oracle.cloud.connector.api.CloudMessageFactory;
 import oracle.cloud.connector.api.Endpoint;
 import oracle.cloud.connector.api.EndpointObserver;
 import oracle.cloud.connector.api.RemoteApplicationException;
 
 import org.bson.Document;
+
+import org.w3c.dom.Node;
 
 public class MongoDBEndpoint implements Endpoint {
     
@@ -43,14 +49,33 @@ public class MongoDBEndpoint implements Endpoint {
     protected void initializeConnectionProperties(CloudInvocationContext cloudInvocationContext) {
         cloudInvocationContext.getCloudConnectionProperties().put(Constants.MONGO_URI_KEY, new MongoDBCredentialStore(cloudInvocationContext).getUrl());
     }
+    
+    protected CloudMessage invokeInsert(Document requestBson) throws CloudInvocationException {
+        connection.getCollection().insertOne(requestBson);
+        
+        Document responseBson = new Document()
+                .append("_id", requestBson.getObjectId("_id"));
+        
+        Node responseXml = new BsonToXmlTransformer().setNamespace(null).transform(responseBson);
+        return CloudMessageFactory.newInstance().createCloudMessage(responseXml);
+    }
 
     @Override
-    public CloudMessage invoke(CloudMessage cloudMessage) throws RemoteApplicationException, CloudInvocationException {
+    public CloudMessage invoke(CloudMessage requestMsg) throws RemoteApplicationException, CloudInvocationException {
         String operationName = (String) ctx.getContextObject("targetOperation");
-        Document bson = (Document) cloudMessage.getMessagePayload();
+        Node xml = requestMsg.getMessagePayloadAsDocument();
+        Document bson = new XmlToBsonTransformer().transform(xml);
         
-        // TODO Implement this method
-        return null;
+        CloudMessage responseMsg;
+        switch(operationName) {
+            case "insert":
+                responseMsg = invokeInsert(bson);
+                break;
+            default:
+                throw new CloudInvocationException("Unknown operation [" + operationName + "]");
+        }
+        
+        return responseMsg;
     }
 
     @Override
@@ -60,16 +85,18 @@ public class MongoDBEndpoint implements Endpoint {
 
     @Override
     public void initialize(CloudInvocationContext cloudInvocationContext) throws CloudInvocationException {
-        logger = cloudInvocationContext.getLoggingService();
-        initializeConnectionProperties(cloudInvocationContext);
+        ctx = cloudInvocationContext;
         
-        String mongoUri = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
-        String mongoDb = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
-        String mongoCollection = (String) cloudInvocationContext.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
+        logger = ctx.getLoggingService();
+        initializeConnectionProperties(ctx);
+        
+        String mongoUri = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
+        String mongoDb = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
+        String mongoCollection = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
         
         logger.log(CloudAdapterLoggingService.Level.DEBUG, "Initializing endpoint for MongoDB");
         
-        connection = new MongoDBConnection(cloudInvocationContext);
+        connection = new MongoDBConnection(ctx);
         connection
             .setMongoUri(mongoUri)
             .setMongoDb(mongoDb)

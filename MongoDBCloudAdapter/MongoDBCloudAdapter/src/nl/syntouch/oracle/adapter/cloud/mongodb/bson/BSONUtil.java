@@ -20,6 +20,11 @@ import java.util.Set;
 
 import javax.xml.namespace.QName;
 
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import javax.xml.parsers.ParserConfigurationException;
+
 import oracle.tip.tools.ide.adapters.cloud.api.model.CloudDataObjectNode;
 import oracle.tip.tools.ide.adapters.cloud.api.model.DataType;
 import oracle.tip.tools.ide.adapters.cloud.api.model.ObjectCategory;
@@ -28,6 +33,11 @@ import oracle.tip.tools.ide.adapters.cloud.impl.metadata.model.FieldImpl;
 
 import org.bson.Document;
 import org.bson.types.ObjectId;
+
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Text;
 
 public class BSONUtil {
     

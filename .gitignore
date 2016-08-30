@@ -4,3 +4,4 @@ deploy
 SCA-INF
 *.lck
 CloudAdapter-DeveloperGuide.pdf
+tstclasses
