@@ -36,7 +36,7 @@ import oracle.security.jps.service.credstore.CredentialStore;
 import oracle.security.jps.service.credstore.GenericCredential;
 
 public class MongoDBCredentialStore {
-    
+
     private final CloudAdapterLoggingService logger;
 
     private String csfkey;
@@ -44,37 +44,37 @@ public class MongoDBCredentialStore {
 
     public MongoDBCredentialStore(CloudInvocationContext cloudInvocationContext) {
         logger = cloudInvocationContext.getLoggingService();
-        
+
         csfkey = (String) cloudInvocationContext.getCloudConnectionProperties().get("csfkey");
         csfmap = (String) cloudInvocationContext.getCloudConnectionProperties().get("csfMap");
     }
-    
+
     public Map<String, String> getCredentials() {
         Map<String, String> credentialMap = new HashMap<>();
-        
+
         try {
             JpsContextFactory jpsContextFactory = JpsContextFactory.getContextFactory();
             JpsContext jpsContext = jpsContextFactory.getContext();
             final CredentialStore store = jpsContext.getServiceInstance(CredentialStore.class);
 
-             credentialMap.putAll(AccessController.doPrivileged(new PrivilegedAction<Map<String, String>> () {
+            credentialMap.putAll(AccessController.doPrivileged(new PrivilegedAction<Map<String, String>>() {
                 public Map<String, String> run() {
                     Map<String, String> credentials = new HashMap<>();
-                    
+
                     try {
                         GenericCredential credential = (GenericCredential) store.getCredential(csfmap, csfkey);
                         credentials.put(Constants.MONGO_URI_KEY, (String) credential.getCredential());
-                    } catch(CredStoreException ex) {
+                    } catch (CredStoreException ex) {
                         logger.logError("Unable to retrieve csfkey [" + csfkey + "] from csfmap [" + csfmap + "]", ex);
                     }
-                    
+
                     return credentials;
                 }
             }));
-        } catch(JpsException ex) {
+        } catch (JpsException ex) {
             logger.logError("Unable to retrieve csfkey [" + csfkey + "] from csfmap [" + csfmap + "]", ex);
         }
-        
+
         return credentialMap;
     }
 

@@ -62,7 +62,7 @@ public class MongoDBEndpoint implements Endpoint {
 
     @Override
     public CloudMessage invoke(CloudMessage requestMsg) throws RemoteApplicationException, CloudInvocationException {
-        String operationName = (String) ctx.getContextObject("targetOperation");
+        String operationName = ctx.getTargetOperationName();
         Node xml = requestMsg.getMessagePayloadAsDocument();
         Document bson = new XmlToBsonTransformer().transform(xml);
         
@@ -93,6 +93,11 @@ public class MongoDBEndpoint implements Endpoint {
         String mongoUri = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_URI_KEY);
         String mongoDb = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_DB_KEY);
         String mongoCollection = (String) ctx.getCloudConnectionProperties().get(Constants.MONGO_COLLECTION_KEY);
+        
+        System.err.println("ctx conn");
+        System.err.println(ctx.getCloudConnectionProperties());
+        System.err.println("ctx opp");
+        System.err.println(ctx.getCloudOperationProperties());
         
         logger.log(CloudAdapterLoggingService.Level.DEBUG, "Initializing endpoint for MongoDB");
         

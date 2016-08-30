@@ -25,6 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.bson.Document;
 
+import org.bson.types.ObjectId;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -46,7 +48,7 @@ public class TestXmlToBsonTransformer {
             if (o instanceof Document) {
                 compareBson((Document) o, (ExpectedBsonField[]) expectation.getValue());
             } else {
-                Assert.assertEquals(expectation.getValue(), o);
+                Assert.assertEquals(expectation.getValue(), o.toString());
             }
         }
     }
@@ -60,32 +62,36 @@ public class TestXmlToBsonTransformer {
     
     @Test
     public void testTransformSimple() throws Exception {
-        org.w3c.dom.Document xml = readInputFile("test1.xml");
+        org.w3c.dom.Document xml = readInputFile("testXmlToBsonSimple.xml");
         Document bson = new XmlToBsonTransformer().transform(xml);
         
         Assert.assertNotNull(bson);
         
-        ExpectedBsonField expectation = new ExpectedBsonField()
-            .setName("rootElement")
-            .setType(Document.class)
-            .setValue(
-                new ExpectedBsonField[] {
-                    new ExpectedBsonField()
-                        .setName("elementOne")
-                        .setType(String.class)
-                        .setValue("value1"),
-                    new ExpectedBsonField()
-                        .setName("elementTwo")
-                        .setType(Document.class)
-                        .setValue(new ExpectedBsonField[] {
-                            new ExpectedBsonField()
-                                .setName("elementThree")
-                                .setType(String.class)
-                                .setValue("value2")
-                        })
-                });
-        
-        compareBson(bson, new ExpectedBsonField[] {expectation});
+        compareBson(bson, new ExpectedBsonField[] {
+            new ExpectedBsonField()
+                .setName("_id")
+                .setType(ObjectId.class)
+                .setValue("57c58ba9f9a5a30aacb17f6a"),
+            new ExpectedBsonField()
+                .setName("rootElement")
+                .setType(Document.class)
+                .setValue(
+                    new ExpectedBsonField[] {
+                        new ExpectedBsonField()
+                            .setName("elementOne")
+                            .setType(String.class)
+                            .setValue("value1"),
+                        new ExpectedBsonField()
+                            .setName("elementTwo")
+                            .setType(Document.class)
+                            .setValue(new ExpectedBsonField[] {
+                                new ExpectedBsonField()
+                                    .setName("elementThree")
+                                    .setType(String.class)
+                                    .setValue("value2")
+                            })
+                    })
+            });
     }
 }
 

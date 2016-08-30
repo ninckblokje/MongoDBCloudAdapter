@@ -25,6 +25,8 @@ import javax.xml.parsers.ParserConfigurationException;
 
 import org.bson.Document;
 
+import org.bson.types.ObjectId;
+
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
@@ -40,7 +42,8 @@ public class BsonToXmlTransformer implements Transformer<Document,Node> {
             Element elem = xml.createElementNS(namespace, key);
             parentXml.appendChild(elem);
             
-            if (o instanceof String) {
+            if (o instanceof String
+                    || o instanceof ObjectId) {
                 elem.appendChild(xml.createTextNode(o.toString()));
             } else {
                 transform(xml, elem, (Document) o, namespace);

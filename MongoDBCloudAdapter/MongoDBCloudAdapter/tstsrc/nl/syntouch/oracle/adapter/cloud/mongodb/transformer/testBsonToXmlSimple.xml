@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Document>
+    <_id>*</_id>
+    <rootElement>
+        <elementOne>value1</elementOne>
+        <elementTwo>
+            <elementThree>value2</elementThree>
+        </elementTwo>
+    </rootElement>
+</Document>

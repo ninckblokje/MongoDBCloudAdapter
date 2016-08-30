@@ -18,6 +18,8 @@ limitations under the License.
 
 import org.bson.Document;
 
+import org.bson.types.ObjectId;
+
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
@@ -26,42 +28,55 @@ public class XmlToBsonTransformer implements Transformer<Node,Document> {
     
     private boolean removeRootNode = true;
     
+    protected boolean isObjectIdNode(Node xml) {
+        return isTextNode(xml)
+            && "_id".equals(xml.getLocalName());
+    }
+    
     protected boolean isTextNode(Node xml) {
         return xml.hasChildNodes()
             && xml.getChildNodes().getLength() == 1
             && xml.getLastChild().getNodeType() == Node.TEXT_NODE;
     }
     
-    protected Document transformNode(Node t) {
-        Document bson = new Document();
-        
+    protected void transformNode(Node t, Document bson) {
         NodeList xmlChildren = t.getChildNodes();
         if (xmlChildren == null ||
                 xmlChildren.getLength() == 0) {
-            return bson;
+            return;
         }
         
         for (int i=0; i<xmlChildren.getLength(); i++) {
             Node xmlChild = xmlChildren.item(i);
             
-            if (isTextNode(xmlChild)) {
+            if (isObjectIdNode(xmlChild)) {
+                bson.append("_id", new ObjectId(xmlChild.getLastChild().getTextContent()));
+            } else if (isTextNode(xmlChild)) {
                 bson.append(xmlChild.getLocalName(), xmlChild.getLastChild().getTextContent());
             } else if (xmlChild.getLocalName() != null) {
-                bson.append(xmlChild.getLocalName(), transformNode(xmlChild));
+                Document subBson = new Document();
+                
+                transformNode(xmlChild, subBson);
+                bson.append(xmlChild.getLocalName(), subBson);
             }
         }
-        
-        return bson;
     }
 
     @Override
     public Document transform(Node t) {
+        Document bson = new Document();
+        
         if (removeRootNode
                 && t.hasChildNodes()) {
-            return transformNode(t.getLastChild());
+            for (int i=0; i<t.getChildNodes().getLength(); i++) {
+                Node childXml = t.getChildNodes().item(i);
+                transformNode(childXml, bson);
+            }
         } else {
-            return transformNode(t);
+            transformNode(t, bson);
         }
+        
+        return bson;
     }
 
     public XmlToBsonTransformer setRemoveRootNode(boolean removeRootNode) {

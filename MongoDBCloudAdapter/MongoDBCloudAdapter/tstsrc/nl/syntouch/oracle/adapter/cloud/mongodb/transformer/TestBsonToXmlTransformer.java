@@ -39,6 +39,8 @@ import javax.xml.transform.stream.StreamResult;
 
 import org.bson.Document;
 
+import org.bson.types.ObjectId;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -47,8 +49,12 @@ import org.w3c.dom.Node;
 import org.xml.sax.SAXException;
 
 import org.xmlunit.builder.DiffBuilder;
+import org.xmlunit.diff.Comparison;
+import org.xmlunit.diff.ComparisonResult;
 import org.xmlunit.diff.Diff;
 import org.xmlunit.diff.Difference;
+import org.xmlunit.diff.DifferenceEvaluator;
+import org.xmlunit.diff.DifferenceEvaluators;
 
 public class TestBsonToXmlTransformer {
     
@@ -79,6 +85,7 @@ public class TestBsonToXmlTransformer {
     @Test
     public void testTransformSimple() throws Exception {
         Document bson = new Document()
+            .append("_id", new ObjectId())
             .append("rootElement", new Document()
                     .append("elementOne", "value1")
                     .append("elementTwo", new Document()
@@ -89,12 +96,59 @@ public class TestBsonToXmlTransformer {
             .transform(bson);
         Assert.assertNotNull(xml);
         
-        Diff diff =DiffBuilder
-            .compare(xml)
-            .withTest(readInputFile("test1.xml"))
+        Diff diff = DiffBuilder
+            .compare(readInputFile("testBsonToXmlSimple.xml"))
+            .withTest(xml)
             .checkForSimilar()
             .ignoreWhitespace()
+            .withDifferenceEvaluator(
+                DifferenceEvaluators.chain(
+                    DifferenceEvaluators.Default,
+                    new ObjectIdDifferenceEvaluator()))
             .build();
+        
+        for (Difference foundDiff: diff.getDifferences()) {
+            System.err.println(foundDiff);
+        }
+        
         Assert.assertFalse(diff.hasDifferences());
+    }
+}
+
+class ObjectIdDifferenceEvaluator implements DifferenceEvaluator {
+    
+    protected Node getControlNode(Comparison comparison) {
+        return comparison.getControlDetails().getTarget();
+    }
+    
+    protected Node getTestNode(Comparison comparison) {
+        return comparison.getTestDetails().getTarget();
+    }
+    
+    protected boolean isEvaluatorApplicable(Comparison comparison) {
+        return comparison.getControlDetails().getTarget() != null
+            && comparison.getControlDetails().getTarget().getNodeType() == Node.TEXT_NODE
+            && "_id".equals(comparison.getControlDetails().getTarget().getParentNode().getLocalName())
+            && comparison.getTestDetails().getTarget() != null
+            && comparison.getTestDetails().getTarget().getNodeType() == Node.TEXT_NODE
+            && "_id".equals(comparison.getTestDetails().getTarget().getParentNode().getLocalName());
+    }
+
+    @Override
+    public ComparisonResult evaluate(Comparison comparison, ComparisonResult comparisonResult) {
+        if (!isEvaluatorApplicable(comparison)) {
+            return comparisonResult;
+        }
+        
+        Node controlNode = getControlNode(comparison);
+        Node testNode = getTestNode(comparison);
+        
+        if ("*".equals(controlNode.getTextContent())) {
+            return ComparisonResult.SIMILAR;
+        } else if (controlNode.getTextContent().equals(testNode.getTextContent())) {
+            return ComparisonResult.EQUAL;
+        } else {
+            return ComparisonResult.DIFFERENT;
+        }
     }
 }
