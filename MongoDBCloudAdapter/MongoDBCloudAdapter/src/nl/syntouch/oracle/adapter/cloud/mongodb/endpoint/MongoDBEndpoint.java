@@ -95,7 +95,9 @@ public class MongoDBEndpoint implements Endpoint {
     @Override
     public CloudMessage invoke(CloudMessage requestMsg) throws RemoteApplicationException, CloudInvocationException {
         Node xml = requestMsg.getMessagePayloadAsDocument();
-        Document bson = new XmlToBsonTransformer().transform(xml);
+        Document bson = new XmlToBsonTransformer()
+                .transform(xml)
+                .get("Document", Document.class);
         
         CloudMessage responseMsg;
         switch(operationName) {
