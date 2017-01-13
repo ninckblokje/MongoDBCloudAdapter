@@ -36,6 +36,7 @@ import java.util.Properties;
 
 import javax.activation.DataSource;
 
+import nl.syntouch.oracle.adapter.cloud.mongodb.bson.BSONUtil;
 import nl.syntouch.oracle.adapter.cloud.mongodb.plugin.bson.BSONDataSource;
 import nl.syntouch.oracle.adapter.cloud.mongodb.definition.Constants;
 
@@ -76,6 +77,10 @@ public class MongoDBMetadataBrowser extends AbstractMetadataBrowser {
         try {
             connection.connect();
             Document sample = connection.getCollection().find().first();
+            if (sample == null) {
+                sample = BSONUtil.getUnstructuredDocument();
+            }
+            
             return sample;
         } finally {
             connection.close();

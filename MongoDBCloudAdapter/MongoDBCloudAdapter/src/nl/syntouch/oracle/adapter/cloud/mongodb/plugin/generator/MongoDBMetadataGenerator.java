@@ -58,7 +58,7 @@ public class MongoDBMetadataGenerator extends AbstractRuntimeMetadataGenerator {
 
     @Override
     protected void initializeContext(RuntimeGenerationContext runtimeGenerationContext) {
-        runtimeGenerationContext.setContextObject(AdapterConstants.RUNTIME_CONNECTION_FACTORY, MongoDBApplicationConnectionFactory.class.getName());
+        runtimeGenerationContext.setContextObject(AdapterConstants.RUNTIME_CONNECTION_FACTORY, Constants.CLOUD_APPLICATION_CONNECTION_FACTORY_CLASS);
         
         CloudConnection connection = getCloudConnection();
         
