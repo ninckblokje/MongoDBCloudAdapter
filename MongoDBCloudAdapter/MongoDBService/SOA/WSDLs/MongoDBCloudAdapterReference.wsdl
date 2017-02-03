@@ -11,17 +11,6 @@
         </plnk:role>
     </plnk:partnerLinkType>
     <wsdl:types>
-        <xs:schema xmlns="MongoDBCloudAdapter/test.test/insert/request" elementFormDefault="qualified"
-             xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="MongoDBCloudAdapter/test.test/insert/request">
-            <xs:complexType name="Document">
-                <xs:sequence>
-                    <xs:element name="_id" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="field1" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
-                    <xs:element name="_unstructured" type="xs:anyType" nillable="true" minOccurs="0"
-                         maxOccurs="1"/>
-                </xs:sequence>
-            </xs:complexType>
-        </xs:schema>
         <xs:schema xmlns="MongoDBCloudAdapter/test.test/insert/response" elementFormDefault="qualified"
              xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="MongoDBCloudAdapter/test.test/insert/response">
             <xs:complexType name="Document">
@@ -34,19 +23,26 @@
         </xs:schema>
         <xs:schema xmlns="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
              elementFormDefault="qualified" xmlns:xs="http://www.w3.org/2001/XMLSchema" targetNamespace="http://xmlns.oracle.com/pcbpel/adapter/MongoDBCloudAdapter/MongoDBCloudAdapter/MongoDBService/MongoDBCloudAdapterReference/types"
-             xmlns:ns2="MongoDBCloudAdapter/test.test/insert/request" xmlns:ns3="MongoDBCloudAdapter/test.test/insert/response">
+             xmlns:ns2="MongoDBCloudAdapter/test.test/insert/response">
             <xs:import namespace="MongoDBCloudAdapter/test.test/insert/response"/>
-            <xs:import namespace="MongoDBCloudAdapter/test.test/insert/request"/>
             <xs:element name="insert" type="insertType"/>
             <xs:complexType name="insertType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" type="ns2:Document" name="Document"/>
+                    <xs:element maxOccurs="1" minOccurs="1" type="Document" name="Document"/>
+                </xs:sequence>
+            </xs:complexType>
+            <xs:complexType name="Document">
+                <xs:sequence>
+                    <xs:element name="_id" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="field1" type="xs:string" nillable="true" minOccurs="0" maxOccurs="1"/>
+                    <xs:element name="_unstructured" type="xs:anyType" nillable="true" minOccurs="0"
+                         maxOccurs="1"/>
                 </xs:sequence>
             </xs:complexType>
             <xs:element name="insertResponse" type="insertResponseType"/>
             <xs:complexType name="insertResponseType">
                 <xs:sequence>
-                    <xs:element maxOccurs="1" minOccurs="1" type="ns3:Document" name="Document"/>
+                    <xs:element maxOccurs="1" minOccurs="1" type="ns2:Document" name="Document"/>
                 </xs:sequence>
             </xs:complexType>
         </xs:schema>

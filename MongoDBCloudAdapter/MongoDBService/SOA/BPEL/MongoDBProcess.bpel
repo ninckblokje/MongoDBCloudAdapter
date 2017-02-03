@@ -70,7 +70,7 @@
     <assign name="Assign2">
       <copy>
         <from>$inputVariable.payload/client:input</from>
-        <to>$InvokeInsert_insert_InputVariable.parameters/ns2:Document/ns4:field1</to>
+        <to>$InvokeInsert_insert_InputVariable.parameters/ns2:Document/ns2:field1</to>
       </copy>
     </assign>
     <invoke name="InvokeInsert" bpelx:invokeAsDetail="no" partnerLink="MongoDBCloudAdapterReference"
